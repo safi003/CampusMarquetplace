@@ -8,7 +8,7 @@ export async function createProduct(req: Request, res: Response) {
     if (!parsed.success) {
       return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
     }
-    const { name, description, price, categoryId } = parsed.data;
+    const { name, description, price, categoryId, address } = parsed.data;
 
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) {
@@ -20,14 +20,17 @@ export async function createProduct(req: Request, res: Response) {
         name,
         description,
         price,
+        address,
         categoryId,
         sellerId: req.user!.id,
       },
     });
 
-    await prisma.productImage.createMany({
-      data: files.map((file) => ({ url: file.path, productId: product.id })),
-    });
+    for (const file of files) {
+      await prisma.productImage.create({
+        data: { url: file.path, productId: product.id },
+      });
+    }
 
     const productWithImages = await prisma.product.findUnique({
       where: { id: product.id },
@@ -43,7 +46,7 @@ export async function createProduct(req: Request, res: Response) {
 
 export async function getProducts(req: Request, res: Response) {
   try {
-    const { search, categoryId } = req.query;
+    const { search, categoryId, sellerId } = req.query;
 
     const products = await prisma.product.findMany({
       where: {
@@ -52,6 +55,7 @@ export async function getProducts(req: Request, res: Response) {
           name: { contains: String(search), mode: "insensitive" },
         }),
         ...(categoryId && { categoryId: Number(categoryId) }),
+        ...(sellerId && { sellerId: Number(sellerId) }),
       },
       include: {
         seller: { select: { id: true, name: true } }, // jamais le password

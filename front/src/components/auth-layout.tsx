@@ -5,33 +5,33 @@ import { usePathname } from "next/navigation";
 
 function BrandPanel() {
   return (
-    <div className="relative hidden overflow-hidden bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155] lg:flex lg:min-h-full lg:items-center lg:justify-center">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-      <div className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-white/5" />
-      <div className="pointer-events-none absolute -bottom-32 -left-32 size-[500px] rounded-full bg-white/5" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 size-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
+    <div className="relative hidden overflow-hidden bg-gradient-to-br from-[#D4A017] via-[#C49215] to-[#A67B12] lg:flex lg:min-h-full lg:items-center lg:justify-center">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+      <div className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-white/10" />
+      <div className="pointer-events-none absolute -bottom-32 -left-32 size-[500px] rounded-full bg-white/10" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 size-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 text-center">
         <svg viewBox="0 0 40 40" fill="none" className="size-16 text-white">
-          <rect width="40" height="40" rx="10" fill="currentColor" fillOpacity="0.15" />
-          <path d="M12 28V16l8-6 8 6v12h-6v-6h-4v6h-6z" fill="currentColor" />
+          <rect width="40" height="40" rx="10" fill="white" fillOpacity="0.2" />
+          <path d="M12 28V16l8-6 8 6v12h-6v-6h-4v6h-6z" fill="white" />
         </svg>
-        <h2 className="text-2xl font-semibold text-white">Campus Marketplace</h2>
-        <p className="max-w-sm text-base leading-relaxed text-slate-300">
+        <h2 className="text-2xl font-semibold text-white drop-shadow-sm">Campus Marketplace</h2>
+        <p className="max-w-sm text-base leading-relaxed text-white/90">
           Achetez et vendez en toute confiance. Trouvez les meilleurs prix sur les livres, fournitures et plus encore.
         </p>
         <div className="mt-4 flex gap-3">
-          <div className="flex flex-col items-center rounded-xl border border-white/10 bg-white/5 px-5 py-3">
+          <div className="flex flex-col items-center rounded-xl border border-white/20 bg-white/15 px-5 py-3 backdrop-blur-sm">
             <span className="text-2xl font-bold text-white">500+</span>
-            <span className="mt-0.5 text-xs text-slate-400">vendeur</span>
+            <span className="mt-0.5 text-xs text-white/80">vendeur</span>
           </div>
-          <div className="flex flex-col items-center rounded-xl border border-white/10 bg-white/5 px-5 py-3">
+          <div className="flex flex-col items-center rounded-xl border border-white/20 bg-white/15 px-5 py-3 backdrop-blur-sm">
             <span className="text-2xl font-bold text-white">1k+</span>
-            <span className="mt-0.5 text-xs text-slate-400">Annonces</span>
+            <span className="mt-0.5 text-xs text-white/80">Annonces</span>
           </div>
-          <div className="flex flex-col items-center rounded-xl border border-white/10 bg-white/5 px-5 py-3">
+          <div className="flex flex-col items-center rounded-xl border border-white/20 bg-white/15 px-5 py-3 backdrop-blur-sm">
             <span className="text-2xl font-bold text-white">50+</span>
-            <span className="mt-0.5 text-xs text-slate-400">Campus</span>
+            <span className="mt-0.5 text-xs text-white/80">Campus</span>
           </div>
         </div>
       </div>

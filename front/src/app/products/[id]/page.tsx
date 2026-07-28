@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Product } from "@/types/product";
 import WishlistButton from "@/components/wishlistButton";
 
@@ -39,7 +40,8 @@ export default async function ProductDetailPage({
       <p className="text-gray-500">{product.category.name}</p>
       <p className="text-xl font-semibold mt-2">{product.price} FCFA</p>
       <p className="mt-4">{product.description}</p>
-      <p className="text-sm text-gray-400 mt-2">Vendu par {product.seller.name}</p>
+      <p className="text-gray-500">📍 {product.address}</p>
+      <p className="text-sm text-gray-400 mt-2">Vendu par <Link href={`/sellers/${product.seller.id}`} className="hover:text-[#D4A017] hover:underline">{product.seller.name}</Link></p>
 
       <div className="mt-6">
         <WishlistButton productId={product.id} />

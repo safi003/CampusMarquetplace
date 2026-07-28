@@ -5,4 +5,5 @@ export const createProductSchema = z.object({
   description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
   price: z.coerce.number().positive("Le prix doit être positif"),
   categoryId: z.coerce.number().int().positive("Catégorie invalide"),
+  address: z.string().min(5, "L'adresse doit contenir au moins 5 caractères"),
 });

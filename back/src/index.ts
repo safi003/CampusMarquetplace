@@ -4,6 +4,9 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
+import categoryRoutes from "./routes/category.routes";
+import reviewRoutes from "./routes/review.routes";
+import userRoutes from "./routes/user.routes";
 
 import path from "path";
 
@@ -18,6 +21,9 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/sellers", userRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.listen(PORT, () => {

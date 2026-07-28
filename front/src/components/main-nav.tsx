@@ -1,53 +1,116 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { User } from "lucide-react";
+import { User, LogOut, Search, Heart, PlusCircle } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Navbar,
   NavBody,
-  NavItems,
   MobileNav,
   MobileNavHeader,
   MobileNavMenu,
   MobileNavToggle,
-  NavbarLogo,
   NavbarButton,
 } from "@/components/ui/resizable-navbar";
 
 const navItems = [
   { name: "Accueil", link: "/" },
-  { name: "Produits", link: "/products" },
 ];
 
 export default function MainNav() {
-  const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { user, logout } = useAuth();
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  }
 
   return (
     <div className="relative z-50">
       <Navbar>
         <NavBody>
           <Link href="/" className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal">
-            <span className="font-semibold text-black dark:text-white">Campus Marketplace</span>
+            <span className="font-semibold text-primary text-2xl">Campus Marketplace</span>
           </Link>
-          <NavItems items={navItems} />
-          <div className="flex items-center gap-2">
-            <NavbarButton href="/login" variant="secondary">
-              <User className="h-4 w-4 mr-1 inline" />
-              Connexion
+
+          <nav className="hidden lg:flex items-center gap-1 relative z-10">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.link}
+                className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#D4A017]/15 transition-colors"
+              >
+                {item.name}
+              </Link>
+            ))}
+            <Link
+              href="/wishlist"
+              className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#D4A017]/15 transition-colors inline-flex items-center gap-1.5"
+            >
+              <Heart className="h-4 w-4" />
+              Favoris
+            </Link>
+          </nav>
+
+          <form onSubmit={handleSearch} className="relative hidden lg:block z-10">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher..."
+              className="w-48 rounded-full border border-border bg-card py-1.5 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </form>
+
+          <div className="flex items-center gap-2 relative z-10">
+            <NavbarButton href={user ? "/products" : "/login"} variant="primary">
+              <PlusCircle className="h-4 w-4 mr-1 inline" />
+              Déposer une annonce
             </NavbarButton>
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600">{user.name}</span>
+                <NavbarButton as="button" onClick={logout} variant="secondary">
+                  <LogOut className="h-4 w-4 mr-1 inline" />
+                  Déconnexion
+                </NavbarButton>
+              </>
+            ) : (
+              <NavbarButton href="/login" variant="secondary">
+                <User className="h-4 w-4 mr-1 inline" />
+                Connexion
+              </NavbarButton>
+            )}
           </div>
         </NavBody>
 
         <MobileNav>
           <MobileNavHeader>
-            <Link href="/" className="text-sm font-semibold text-black dark:text-white">
+            <Link href="/" className="text-sm font-semibold text-primary">
               Campus Marketplace
             </Link>
             <MobileNavToggle isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
           </MobileNavHeader>
+          <div className="w-full px-4 pt-3 pb-2 lg:hidden">
+            <form onSubmit={handleSearch} className="relative w-full">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher..."
+                className="w-full rounded-full border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              />
+            </form>
+          </div>
           <MobileNavMenu isOpen={isOpen} onClose={() => setIsOpen(false)}>
             {navItems.map((item) => (
               <a
@@ -59,11 +122,33 @@ export default function MainNav() {
                 {item.name}
               </a>
             ))}
+            <a
+              href="/wishlist"
+              onClick={() => setIsOpen(false)}
+              className="text-neutral-600 dark:text-neutral-300 inline-flex items-center gap-1.5"
+            >
+              <Heart className="h-4 w-4" />
+              Favoris
+            </a>
             <div className="flex w-full flex-col gap-2 pt-4">
-              <NavbarButton href="/login" variant="secondary" className="w-full">
-                <User className="h-4 w-4 mr-1 inline" />
-                Connexion
+              <NavbarButton href={user ? "/products" : "/login"} variant="primary" className="w-full">
+                <PlusCircle className="h-4 w-4 mr-1 inline" />
+                Déposer une annonce
               </NavbarButton>
+              {user ? (
+                <>
+                  <span className="text-sm text-gray-600 text-center">{user.name}</span>
+                  <NavbarButton as="button" onClick={logout} variant="secondary" className="w-full">
+                    <LogOut className="h-4 w-4 mr-1 inline" />
+                    Déconnexion
+                  </NavbarButton>
+                </>
+              ) : (
+                <NavbarButton href="/login" variant="secondary" className="w-full">
+                  <User className="h-4 w-4 mr-1 inline" />
+                  Connexion
+                </NavbarButton>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>

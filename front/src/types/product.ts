@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  address: string;
   isSold: boolean;
   createdAt: string;
   images: { id: number; url: string }[]; // remplace image: string | null

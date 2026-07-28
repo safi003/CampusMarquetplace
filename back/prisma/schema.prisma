@@ -30,6 +30,8 @@ model User {
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
   wishlists Wishlist[]
+  reviewsGiven  Review[] @relation("ReviewedBy")
+  reviewsReceived Review[] @relation("SellerReviews")
 }
 
 model Category {
@@ -47,6 +49,7 @@ model Product {
   description String
   price       Decimal
   image       String?
+  address     String?
   isSold      Boolean  @default(false)
   createdAt   DateTime @default(now())
 
@@ -91,4 +94,18 @@ model Wishlist {
   productId Int
 
   @@unique([userId, productId]) // empêche les doublons (même produit ajouté 2x)
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  reviewer User @relation("ReviewedBy", fields: [reviewerId], references: [id])
+  reviewerId Int
+  seller   User @relation("SellerReviews", fields: [sellerId], references: [id])
+  sellerId Int
+
+  @@unique([reviewerId, sellerId]) // un seul avis par acheteur par vendeur
 }

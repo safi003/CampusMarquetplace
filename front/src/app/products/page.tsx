@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,21 +16,34 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export default function CreateProductPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [address, setAddress] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch(() => {});
+  }, []);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return;
-    const newFiles = Array.from(e.target.files);
-
-    setFiles((prevFiles) => [...prevFiles, ...newFiles].slice(0, 5)); // cumule, max 5
+    setFiles(Array.from(e.target.files).slice(0, 5));
   }
 
   function removeFile(index: number) {
@@ -90,6 +103,9 @@ export default function CreateProductPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="flex flex-col gap-4">
+            <div className="rounded-lg bg-[#D4A017]/10 border border-[#D4A017]/20 px-4 py-3 text-sm text-[#D4A017]">
+              <span className="font-semibold">Conseil :</span> Prenez plusieurs photos claires de votre article sous différents angles pour éviter toute confusion avec les acheteurs.
+            </div>
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -109,16 +125,26 @@ export default function CreateProductPage() {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
-                placeholder="Décrivez votre article en détail..."
+                placeholder="Décrivez votre article en détail sa aidera dans la recherche..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
                 rows={4}
               />
             </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="address">Adresse de retrait</Label>
+              <Input
+                id="address"
+                placeholder="Ex: Campus de l'Université, Bâtiment A"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="price">Prix (FCFA)</Label>
+                <Label htmlFor="price">Prix </Label>
                 <Input
                   id="price"
                   type="number"
@@ -129,15 +155,19 @@ export default function CreateProductPage() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="categoryId">ID Catégorie</Label>
-                <Input
+                <Label htmlFor="categoryId">Catégorie</Label>
+                <select
                   id="categoryId"
-                  type="number"
-                  placeholder="1"
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   required
-                />
+                  className="flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 transition-all"
+                >
+                  <option value="" disabled>Choisir une catégorie</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="flex flex-col gap-2">
