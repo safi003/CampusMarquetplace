@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   Card,
   CardContent,
@@ -43,7 +44,9 @@ export default function CreateProductPage() {
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return;
-    setFiles(Array.from(e.target.files).slice(0, 5));
+    const newFiles = Array.from(e.target.files);
+    setFiles((prev) => [...prev, ...newFiles].slice(0, 5));
+    e.target.value = "";
   }
 
   function removeFile(index: number) {
@@ -65,6 +68,7 @@ export default function CreateProductPage() {
     formData.append("description", description);
     formData.append("price", price);
     formData.append("categoryId", categoryId);
+    formData.append("address", address);
     files.forEach((file) => formData.append("images", file));
 
     try {
@@ -178,7 +182,6 @@ export default function CreateProductPage() {
                 accept="image/*"
                 multiple
                 onChange={handleFileChange}
-                required
                 className="file:mr-2 file:h-6 file:rounded-md file:border-0 file:bg-primary file:px-3 file:text-xs file:font-medium file:text-primary-foreground file:hover:bg-primary/90"
               />
               {files.length > 0 && (

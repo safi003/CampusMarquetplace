@@ -3,6 +3,7 @@ import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import MainNav from "@/components/main-nav";
 import { AuthProvider } from "@/contexts/auth-context";
+import { Footer } from "@/components/footer";
 
 const nunitoSans = Nunito_Sans({
   subsets: ["latin"],
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <MainNav />
           <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>

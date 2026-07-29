@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { createProductSchema } from "../validators/product.validator";
+import fs from "fs";
+import path from "path";
 
 export async function createProduct(req: Request, res: Response) {
   try {
@@ -88,6 +90,70 @@ export async function getProductById(req: Request, res: Response) {
     }
 
     return res.status(200).json(product);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
+export async function deleteProduct(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: { images: true },
+    });
+    if (!product) {
+      return res.status(404).json({ message: "Produit introuvable" });
+    }
+
+    if (product.sellerId !== req.user!.id) {
+      return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce produit" });
+    }
+
+    for (const img of product.images) {
+      const filePath = path.resolve(img.url);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await prisma.product.delete({ where: { id } });
+    return res.status(200).json({ message: "Produit supprimé" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
+export async function updateProduct(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product) {
+      return res.status(404).json({ message: "Produit introuvable" });
+    }
+
+    if (product.sellerId !== req.user!.id) {
+      return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce produit" });
+    }
+
+    const { name, description, price, categoryId, address } = req.body;
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+        ...(price !== undefined && { price: Number(price) }),
+        ...(categoryId !== undefined && { categoryId: Number(categoryId) }),
+        ...(address !== undefined && { address }),
+      },
+    });
+
+    return res.status(200).json(updated);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Erreur serveur" });

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { User, LogOut, Search, Heart, PlusCircle } from "lucide-react";
+import { User, LogOut, Search, Heart, PlusCircle, Smartphone, BookOpen, Shirt, Sofa, Bike, Ellipsis } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import {
   Navbar,
@@ -17,6 +17,15 @@ import {
 
 const navItems = [
   { name: "Accueil", link: "/" },
+];
+
+const categories = [
+  { name: "Électronique", icon: Smartphone, slug: "electronique" },
+  { name: "Livres", icon: BookOpen, slug: "livres" },
+  { name: "Vêtements", icon: Shirt, slug: "vetements" },
+  { name: "Meubles", icon: Sofa, slug: "meubles" },
+  { name: "Vélos & Transport", icon: Bike, slug: "transport" },
+  { name: "Autres", icon: Ellipsis, slug: "autres" },
 ];
 
 export default function MainNav() {
@@ -33,6 +42,7 @@ export default function MainNav() {
   }
 
   return (
+    <>
     <div className="relative z-50">
       <Navbar>
         <NavBody>
@@ -154,5 +164,22 @@ export default function MainNav() {
         </MobileNav>
       </Navbar>
     </div>
+
+      <div className="flex items-center justify-start gap-1 px-4 py-2 overflow-x-auto max-w-[100vw] flex-nowrap border-b border-border bg-card/50">
+        {categories.map((cat) => {
+          const Icon = cat.icon;
+          return (
+            <Link
+              key={cat.slug}
+              href={`/products?category=${cat.slug}`}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground rounded-full hover:bg-[#D4A017]/10 hover:text-[#D4A017] transition-colors flex-shrink-0"
+            >
+              <Icon className="h-4 w-4" />
+              {cat.name}
+            </Link>
+          );
+        })}
+      </div>
+    </>
   );
 }
