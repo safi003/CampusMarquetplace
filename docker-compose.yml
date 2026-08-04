@@ -1,0 +1,47 @@
+services:
+  back:
+    build:
+      context: ./back
+    container_name: campus-back
+    env_file:
+      - ./back/.env
+    environment:
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - uploads:/app/uploads
+    restart: unless-stopped
+
+  front:
+    build:
+      context: ./front
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:3000/api
+        API_PROXY_TARGET: http://back:5000
+    container_name: campus-front
+    environment:
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - back
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: minio-server
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: motdepasse123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+volumes:
+  uploads:
+  minio_data:
