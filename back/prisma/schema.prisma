@@ -22,8 +22,9 @@ model User {
   name               String
   role               UserRole @default(STUDENT)
   email              String   @unique
-  password           String
-  imageCarteScolaire String
+  password           String?
+  googleId           String?  @unique
+  imageCarteScolaire String?
   createdAt          DateTime @default(now())
 
   products      Product[]

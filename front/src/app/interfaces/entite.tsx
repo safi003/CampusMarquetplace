@@ -5,8 +5,9 @@ export interface User {
   name: string;
   role: UserRole;
   email: string;
-  password: string;
-  imageCarteScolaire: string;
+  password?: string;
+  googleId?: string | null;
+  imageCarteScolaire?: string | null;
 }
 
 export type PublicUser = Omit<User, "password">;

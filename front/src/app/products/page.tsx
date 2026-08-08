@@ -80,6 +80,10 @@ export default function CreateProductPage() {
       });
 
       const data = await res.json();
+      if (res.status === 403) {
+        router.push("/carte-scolaire");
+        return;
+      }
       if (!res.ok) {
         const msg =
           data.message ||

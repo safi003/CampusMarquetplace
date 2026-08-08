@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login , getMe} from "../controllers/auth.controller";
+import { register, login, googleLogin, getMe, uploadCarteScolaire } from "../controllers/auth.controller";
 import { upload } from "../middlewares/upload.middleware";
 import { authenticate } from "../middlewares/auth.middleware";
 
@@ -7,7 +7,9 @@ const router = Router();
 
 router.post("/register", upload.single("imageCarteScolaire"), register);
 router.post("/login", login);
+router.post("/google", googleLogin);
 router.get("/me", authenticate, getMe);
+router.put("/carte", authenticate, upload.single("imageCarteScolaire"), uploadCarteScolaire);
 
 
 export default router;

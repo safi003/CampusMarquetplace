@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Product } from "@/types/product";
 import WishlistButton from "@/components/wishlistButton";
 import { DeleteProductButton } from "@/components/delete-product-button";
@@ -12,13 +13,17 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-async function getProduct(id: string): Promise<Product> {
+async function getProduct(id: string): Promise<Product | null> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
     cache: "no-store",
   });
 
+  if (res.status === 404) {
+    return null;
+  }
+
   if (!res.ok) {
-    throw new Error("Produit introuvable");
+    throw new Error("Erreur lors du chargement du produit");
   }
 
   return res.json();
@@ -31,6 +36,10 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
   const product = await getProduct(id);
+
+  if (!product) {
+    notFound();
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-6">

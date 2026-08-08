@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
+import { uploadFile, generateKey, removeFile } from "../lib/storage";
 import { createProductSchema } from "../validators/product.validator";
-import fs from "fs";
-import path from "path";
 
 export async function createProduct(req: Request, res: Response) {
   try {
@@ -17,6 +16,11 @@ export async function createProduct(req: Request, res: Response) {
       return res.status(400).json({ message: "Au moins une photo est requise" });
     }
 
+    const seller = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!seller?.imageCarteScolaire) {
+      return res.status(403).json({ message: "Ajoutez votre pièce d'identité avant de publier une annonce" });
+    }
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -29,8 +33,10 @@ export async function createProduct(req: Request, res: Response) {
     });
 
     for (const file of files) {
+      const key = generateKey("uploads/products", file.originalname);
+      const objectKey = await uploadFile(file.buffer, key, file.mimetype);
       await prisma.productImage.create({
-        data: { url: file.path, productId: product.id },
+        data: { url: objectKey, productId: product.id },
       });
     }
 
@@ -113,10 +119,7 @@ export async function deleteProduct(req: Request, res: Response) {
     }
 
     for (const img of product.images) {
-      const filePath = path.resolve(img.url);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+      await removeFile(img.url);
     }
 
     await prisma.product.delete({ where: { id } });

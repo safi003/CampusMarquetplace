@@ -1,17 +1,6 @@
 import multer from "multer";
-import path from "path";
 
-// storage définit OÙ et COMMENT le fichier est sauvegardé sur le disque
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/cartes-scolaires"); // dossier de destination
-  },
-  filename: (req, file, cb) => {
-    // évite les collisions de noms : timestamp + extension originale
-    const uniqueName = `${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
+// Le fichier est conservé en mémoire, puis envoyé vers RustFS (voir src/lib/storage.ts)
 
 // filtre : n'accepte que les images
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
@@ -22,16 +11,6 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
   }
 };
 
-export const upload = multer({ storage, fileFilter });
+export const upload = multer({ storage: multer.memoryStorage(), fileFilter });
 
-const productStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/products");
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
-
-export const uploadProductImages = multer({ storage: productStorage, fileFilter });
+export const uploadProductImages = multer({ storage: multer.memoryStorage(), fileFilter });

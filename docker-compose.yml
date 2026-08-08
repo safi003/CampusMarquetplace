@@ -7,6 +7,7 @@ services:
       - ./back/.env
     environment:
       PORT: 5000
+      RUSTFS_ENDPOINT: http://rustfs:9000
     ports:
       - "5000:5000"
     volumes:
@@ -28,20 +29,23 @@ services:
       - back
     restart: unless-stopped
 
-  minio:
-    image: minio/minio
-    container_name: minio-server
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs-server
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: motdepasse123
+      RUSTFS_ACCESS_KEY: admin
+      RUSTFS_SECRET_KEY: motdepasse123
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_OBS_LOGGER_LEVEL: error
     volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
+      - rustfs_data:/data
     restart: unless-stopped
 
 volumes:
   uploads:
-  minio_data:
+  rustfs_data:

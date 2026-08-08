@@ -7,7 +7,7 @@ interface User {
   name: string;
   email: string;
   role: string;
-  imageCarteScolaire: string;
+  imageCarteScolaire: string | null;
 }
 
 interface AuthContextType {
