@@ -20,6 +20,14 @@ export async function createProduct(req: Request, res: Response) {
     if (!seller?.imageCarteScolaire) {
       return res.status(403).json({ message: "Ajoutez votre pièce d'identité avant de publier une annonce" });
     }
+    if (seller.cardStatus !== "APPROVED") {
+      return res.status(403).json({
+        message:
+          seller.cardStatus === "REJECTED"
+            ? "Votre pièce d'identité a été refusée. Veuillez la renvoyer pour revalidation."
+            : "Votre pièce d'identité est en attente de vérification par un administrateur.",
+      });
+    }
 
     const product = await prisma.product.create({
       data: {

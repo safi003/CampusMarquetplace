@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { User, LogOut, Search, Heart, PlusCircle, Smartphone, BookOpen, Shirt, Sofa, Bike, Utensils, Dumbbell, Laptop, Music, Ellipsis } from "lucide-react";
+import { User, LogOut, Search, Heart, PlusCircle, Smartphone, BookOpen, Shirt, Sofa, Bike, Utensils, Dumbbell, Laptop, Music, Ellipsis, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import {
   Navbar,
@@ -38,6 +38,13 @@ export default function MainNav() {
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
 
+  const isAdmin = user?.role === "ADMIN";
+  const showVerifyBanner =
+    user &&
+    !isAdmin &&
+    user.imageCarteScolaire &&
+    (user.cardStatus === "PENDING" || user.cardStatus === "REJECTED");
+
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -64,6 +71,15 @@ export default function MainNav() {
                 {item.name}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#D4A017]/15 transition-colors inline-flex items-center gap-1.5"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             <Link
               href="/wishlist"
               className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#D4A017]/15 transition-colors inline-flex items-center gap-1.5"
@@ -136,6 +152,16 @@ export default function MainNav() {
                 {item.name}
               </a>
             ))}
+            {isAdmin && (
+              <a
+                href="/admin"
+                onClick={() => setIsOpen(false)}
+                className="text-neutral-600 dark:text-neutral-300 inline-flex items-center gap-1.5"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </a>
+            )}
             <a
               href="/wishlist"
               onClick={() => setIsOpen(false)}
@@ -168,6 +194,23 @@ export default function MainNav() {
         </MobileNav>
       </Navbar>
     </div>
+
+    {showVerifyBanner && (
+      <div
+        className={`px-4 py-2 text-center text-sm ${
+          user.cardStatus === "REJECTED"
+            ? "bg-red-50 text-red-700 border-b border-red-200"
+            : "bg-[#D4A017]/10 text-[#B8860B] border-b border-[#D4A017]/20"
+        }`}
+      >
+        {user.cardStatus === "REJECTED"
+          ? `Votre pièce d'identité a été refusée : ${user.cardRejectionReason || "motif non précisé"}. `
+          : "Votre pièce d'identité est en attente de vérification. "}
+        <Link href="/carte-scolaire" className="font-semibold underline underline-offset-2">
+          Envoyer une nouvelle pi&egrave;ce d&apos;identit&eacute;
+        </Link>
+      </div>
+    )}
 
       <div className="flex items-center justify-start gap-1 px-4 py-2 overflow-x-auto max-w-[100vw] flex-nowrap border-b border-border bg-card/50">
         {categories.map((cat) => {

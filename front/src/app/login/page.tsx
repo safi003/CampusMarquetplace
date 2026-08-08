@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginRequest } from "@/app/lib/api";
 import { useAuth } from "@/contexts/auth-context";
@@ -18,6 +18,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingInfo, setPendingInfo] = useState(false);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has("verify")) {
+      const id = setTimeout(() => setPendingInfo(true), 0);
+      return () => clearTimeout(id);
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +46,14 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        {pendingInfo && (
+          <Alert className="border-[#D4A017]/30 bg-[#D4A017]/10 text-[#D4A017]">
+            <AlertDescription>
+              Compte créé. Votre pièce d&apos;identité est en attente de vérification : elle sera validée par
+              un administrateur avant que vous puissiez publier des annonces.
+            </AlertDescription>
+          </Alert>
+        )}
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>

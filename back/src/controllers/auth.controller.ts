@@ -42,7 +42,9 @@ export async function register(req: Request, res: Response) {
         email,
         password: hashedPassword,
         role: role.toUpperCase() as "STUDENT" | "ADMIN", // aligné avec l'enum Prisma
-        ...(carteKey ? { imageCarteScolaire: carteKey } : {}),
+        ...(carteKey
+          ? { imageCarteScolaire: carteKey, cardStatus: "PENDING" as const }
+          : {}),
       },
     });
 
@@ -173,7 +175,11 @@ export async function uploadCarteScolaire(req: Request, res: Response) {
 
     const user = await prisma.user.update({
       where: { id: req.user!.id },
-      data: { imageCarteScolaire: carteKey },
+      data: {
+        imageCarteScolaire: carteKey,
+        cardStatus: "PENDING",
+        cardRejectionReason: null,
+      },
     });
 
     const { password: _, ...publicUser } = user;

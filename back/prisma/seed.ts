@@ -225,6 +225,21 @@ async function main() {
   // 2. Utilisateurs (vendeurs de test)
   const hashed = await bcrypt.hash(PASSWORD, 10);
   const users: { id: number; name: string }[] = [];
+
+  const adminEmail = "admin@univ.fr";
+  if (!(await prisma.user.findUnique({ where: { email: adminEmail } }))) {
+    await prisma.user.create({
+      data: {
+        name: "Administrateur",
+        email: adminEmail,
+        password: hashed,
+        role: "ADMIN",
+        cardStatus: "APPROVED",
+      },
+    });
+    console.log("Admin : admin@univ.fr / admin1234 OK");
+  }
+
   for (let i = 0; i < SEED_USERS.length; i++) {
     const email = `test${i + 1}@univ.fr`;
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -234,6 +249,7 @@ async function main() {
           data: {
             name: SEED_USERS[i],
             imageCarteScolaire: `uploads/cartes-scolaires/seed-${i + 1}.png`,
+            cardStatus: "APPROVED",
           },
         })
       : await prisma.user.create({
@@ -242,6 +258,7 @@ async function main() {
             email,
             password: hashed,
             imageCarteScolaire: `uploads/cartes-scolaires/seed-${i + 1}.png`,
+            cardStatus: "APPROVED",
           },
         });
     users.push({ id: user.id, name: user.name });

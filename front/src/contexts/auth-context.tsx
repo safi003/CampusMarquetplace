@@ -8,6 +8,8 @@ interface User {
   email: string;
   role: string;
   imageCarteScolaire: string | null;
+  cardStatus: "PENDING" | "APPROVED" | "REJECTED" | null;
+  cardRejectionReason: string | null;
 }
 
 interface AuthContextType {

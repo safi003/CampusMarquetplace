@@ -17,6 +17,12 @@ enum UserRole {
   ADMIN
 }
 
+enum CardStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id                 Int      @id @default(autoincrement())
   name               String
@@ -25,6 +31,8 @@ model User {
   password           String?
   googleId           String?  @unique
   imageCarteScolaire String?
+  cardStatus         CardStatus @default(PENDING)
+  cardRejectionReason String?
   createdAt          DateTime @default(now())
 
   products      Product[]

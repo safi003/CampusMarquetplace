@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [carte, setCarte] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -26,6 +27,9 @@ export default function RegisterPage() {
     formData.append("name", name);
     formData.append("email", email);
     formData.append("password", password);
+    if (carte) {
+      formData.append("imageCarteScolaire", carte);
+    }
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
@@ -42,7 +46,7 @@ export default function RegisterPage() {
         throw new Error(msg);
       }
 
-      router.push("/login");
+      router.push(carte ? "/login?verify=1" : "/login");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -108,6 +112,21 @@ export default function RegisterPage() {
               required
               className="h-10"
             />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="carte" className="text-sm font-medium text-foreground">
+              Pièce d&apos;identité <span className="font-normal text-muted-foreground">(recommandé)</span>
+            </Label>
+            <Input
+              id="carte"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setCarte(e.target.files?.[0] || null)}
+              className="h-10 file:mr-2 file:h-6 file:rounded-md file:border-0 file:bg-primary file:px-3 file:text-xs file:font-medium file:text-primary-foreground file:hover:bg-primary/90"
+            />
+            <p className="text-xs text-muted-foreground">
+              Votre compte sera vérifié par un administrateur avant de pouvoir publier des annonces.
+            </p>
           </div>
         </div>
 

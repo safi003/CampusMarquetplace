@@ -8,6 +8,7 @@ import wishlistRoutes from "./routes/wishlist.routes";
 import categoryRoutes from "./routes/category.routes";
 import reviewRoutes from "./routes/review.routes";
 import userRoutes from "./routes/user.routes";
+import adminRoutes from "./routes/admin.routes";
 import { getFileStream } from "./lib/storage";
 
 import path from "path";
@@ -45,6 +46,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/sellers", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

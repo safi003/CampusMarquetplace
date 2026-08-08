@@ -65,6 +65,8 @@ export default function CarteScolairePage() {
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
         parsed.imageCarteScolaire = data.imageCarteScolaire;
+        parsed.cardStatus = data.cardStatus;
+        parsed.cardRejectionReason = data.cardRejectionReason ?? null;
         localStorage.setItem("user", JSON.stringify(parsed));
       }
 
@@ -93,6 +95,29 @@ export default function CarteScolairePage() {
               sert uniquement à vérifier votre identité. Elle n&apos;est
               jamais visible par les autres utilisateurs.
             </div>
+
+            {user.cardStatus === "PENDING" && (
+              <Alert className="border-[#D4A017]/30 bg-[#D4A017]/10 text-[#D4A017]">
+                <AlertDescription>
+                  Votre pièce d&apos;identité est en cours de vérification par un administrateur.
+                </AlertDescription>
+              </Alert>
+            )}
+            {user.cardStatus === "APPROVED" && (
+              <Alert className="border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
+                <AlertDescription>
+                  Votre compte est vérifié. Vous pouvez publier des annonces.
+                </AlertDescription>
+              </Alert>
+            )}
+            {user.cardStatus === "REJECTED" && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Votre pièce d&apos;identité a été refusée : {user.cardRejectionReason || "motif non précisé"}. Envoyez une
+                  nouvelle photo pour être revalidé.
+                </AlertDescription>
+              </Alert>
+            )}
 
             {user.imageCarteScolaire && (
               <Alert variant="default" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
