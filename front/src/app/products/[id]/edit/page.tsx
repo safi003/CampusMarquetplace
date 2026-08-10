@@ -77,7 +77,13 @@ export default function EditProductPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, description, price, categoryId, address }),
+        body: JSON.stringify({
+          name,
+          description,
+          price,
+          categoryId,
+          address,
+        }),
       })
 
       if (!res.ok) {

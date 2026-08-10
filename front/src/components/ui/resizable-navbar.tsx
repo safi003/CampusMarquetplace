@@ -69,7 +69,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     <motion.div
       ref={ref}
       // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      className={cn("sticky top-0 z-40 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -87,24 +87,21 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(10px)" : "none",
         boxShadow: visible
-          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-          : "none",
-        width: visible ? "40%" : "100%",
-        y: visible ? 20 : 0,
+          ? "0 4px 12px rgba(0, 0, 0, 0.06)"
+          : "0 1px 2px rgba(0, 0, 0, 0.04)",
       }}
       transition={{
         type: "spring",
         stiffness: 200,
-        damping: 50,
+        damping: 30,
       }}
       style={{
         minWidth: "800px",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-[#D4A017]/5 px-4 py-2 lg:flex dark:bg-[#D4A017]/5",
-        visible && "bg-[#D4A017]/10 dark:bg-[#D4A017]/10",
+        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full border border-[#4AA3A2]/20 bg-background/80 px-4 py-2 lg:flex dark:bg-neutral-950/80 backdrop-blur-md",
+        visible && "bg-background shadow-lg dark:bg-neutral-950",
         className,
       )}
     >
@@ -135,7 +132,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-[#D4A017]/15 dark:bg-[#D4A017]/20"
+              className="absolute inset-0 h-full w-full rounded-full bg-[#4AA3A2]/15 dark:bg-[#4AA3A2]/20"
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -149,24 +146,16 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(10px)" : "none",
-        boxShadow: visible
-          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-          : "none",
-        width: visible ? "90%" : "100%",
-        paddingRight: visible ? "12px" : "0px",
-        paddingLeft: visible ? "12px" : "0px",
-        borderRadius: visible ? "4px" : "2rem",
-        y: visible ? 20 : 0,
+        boxShadow: visible ? "0 4px 12px rgba(0, 0, 0, 0.06)" : "none",
       }}
       transition={{
         type: "spring",
         stiffness: 200,
-        damping: 50,
+        damping: 30,
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
-        visible && "bg-white/80 dark:bg-neutral-950/80",
+        visible && "rounded-2xl bg-background/95 shadow-sm backdrop-blur-md dark:bg-neutral-950/95",
         className,
       )}
     >

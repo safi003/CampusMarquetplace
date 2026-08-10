@@ -30,9 +30,9 @@ export default async function HomePage() {
     <div className="space-y-16">
       <section className="flex flex-col items-center gap-6 py-12 text-center">
         <Text3DFlip
-          className="text-[#D4A017] text-3xl sm:text-5xl font-bold flex justify-center flex-wrap"
-          textClassName="text-[#D4A017]"
-          flipTextClassName="text-[#D4A017]"
+          className="text-[#4AA3A2] text-3xl sm:text-5xl font-bold flex justify-center flex-wrap"
+          textClassName="text-[#4AA3A2]"
+          flipTextClassName="text-[#4AA3A2]"
           rotateDirection="top"
         >
           Achetez et vendez a petit prix 

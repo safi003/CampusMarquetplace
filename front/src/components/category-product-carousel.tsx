@@ -33,7 +33,7 @@ export function CategoryProductCarousel({ categoryName, products }: CategoryCaro
         <h2 className="text-2xl font-semibold text-foreground">{categoryName}</h2>
         <Link
           href={`/categories/${products[0].category.slug}`}
-          className="text-sm font-medium text-[#D4A017] hover:underline"
+          className="text-sm font-medium text-[#4AA3A2] hover:underline"
         >
           Voir tout →
         </Link>

@@ -61,7 +61,7 @@ export default function SellerTabs({
     <div>
       <div className="rounded-2xl border border-border bg-card p-6 mb-6">
         <div className="flex items-center gap-5">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#D4A017]/10 text-2xl font-bold text-[#D4A017]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#4AA3A2]/10 text-2xl font-bold text-[#4AA3A2]">
             {name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1">
@@ -77,7 +77,7 @@ export default function SellerTabs({
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-[#D4A017]">{products.length}</p>
+            <p className="text-2xl font-bold text-[#4AA3A2]">{products.length}</p>
             <p className="text-xs text-muted-foreground">annonce{products.length > 1 ? "s" : ""} active{products.length > 1 ? "s" : ""}</p>
           </div>
         </div>
@@ -128,11 +128,11 @@ export default function SellerTabs({
                     </div>
                   )}
                   <div className="p-3">
-                    <span className="inline-block rounded-full bg-[#D4A017]/10 px-2 py-0.5 text-xs font-medium text-[#D4A017]">
+                    <span className="inline-block rounded-full bg-[#4AA3A2]/10 px-2 py-0.5 text-xs font-medium text-[#4AA3A2]">
                       {product.category.name}
                     </span>
                     <h3 className="mt-1 font-semibold text-sm">{product.name}</h3>
-                    <p className="mt-2 text-base font-bold text-[#D4A017]">{product.price} FCFA</p>
+                    <p className="mt-2 text-base font-bold text-[#4AA3A2]">{product.price} FCFA</p>
                   </div>
                 </Link>
               ))}

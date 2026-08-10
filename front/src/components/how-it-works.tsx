@@ -17,8 +17,8 @@ export default function HowItWorks() {
       >
         <Step>
           <div className="flex flex-col items-center gap-3 py-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D4A017]/10">
-              <Package className="h-7 w-7 text-[#D4A017]" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4AA3A2]/10">
+              <Package className="h-7 w-7 text-[#4AA3A2]" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">Déposez votre annonce</h3>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -29,8 +29,8 @@ export default function HowItWorks() {
         </Step>
         <Step>
           <div className="flex flex-col items-center gap-3 py-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D4A017]/10">
-              <CreditCard className="h-7 w-7 text-[#D4A017]" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4AA3A2]/10">
+              <CreditCard className="h-7 w-7 text-[#4AA3A2]" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">Paiement sécurisé</h3>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -42,8 +42,8 @@ export default function HowItWorks() {
         </Step>
         <Step>
           <div className="flex flex-col items-center gap-3 py-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D4A017]/10">
-              <ShieldCheck className="h-7 w-7 text-[#D4A017]" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4AA3A2]/10">
+              <ShieldCheck className="h-7 w-7 text-[#4AA3A2]" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">Protection acheteur</h3>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -55,8 +55,8 @@ export default function HowItWorks() {
         </Step>
         <Step>
           <div className="flex flex-col items-center gap-3 py-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D4A017]/10">
-              <Star className="h-7 w-7 text-[#D4A017]" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4AA3A2]/10">
+              <Star className="h-7 w-7 text-[#4AA3A2]" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">Laissez un avis</h3>
             <p className="max-w-md text-sm text-muted-foreground">

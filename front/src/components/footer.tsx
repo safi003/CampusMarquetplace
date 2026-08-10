@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-lg font-bold text-[#D4A017] mb-3">Campus Marketplace</h3>
+            <h3 className="text-lg font-bold text-[#4AA3A2] mb-3">Campus Marketplace</h3>
             <p className="text-sm text-muted-foreground">
               Achetez et vendez entre étudiants sur votre campus.
             </p>
@@ -15,20 +15,20 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-foreground mb-3">Navigation</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/" className="hover:text-[#D4A017] transition-colors">Accueil</Link></li>
-              <li><Link href="/products" className="hover:text-[#D4A017] transition-colors">Vendre</Link></li>
-              <li><Link href="/login" className="hover:text-[#D4A017] transition-colors">Connexion</Link></li>
-              <li><Link href="/register" className="hover:text-[#D4A017] transition-colors">Inscription</Link></li>
+              <li><Link href="/" className="hover:text-[#4AA3A2] transition-colors">Accueil</Link></li>
+              <li><Link href="/products" className="hover:text-[#4AA3A2] transition-colors">Vendre</Link></li>
+              <li><Link href="/login" className="hover:text-[#4AA3A2] transition-colors">Connexion</Link></li>
+              <li><Link href="/register" className="hover:text-[#4AA3A2] transition-colors">Inscription</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-foreground mb-3">Catégories</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><span className="hover:text-[#D4A017] transition-colors cursor-pointer">Cours & Révisions</span></li>
-              <li><span className="hover:text-[#D4A017] transition-colors cursor-pointer">Électronique</span></li>
-              <li><span className="hover:text-[#D4A017] transition-colors cursor-pointer">Mode & Accessoires</span></li>
-              <li><span className="hover:text-[#D4A017] transition-colors cursor-pointer">Services</span></li>
+              <li><span className="hover:text-[#4AA3A2] transition-colors cursor-pointer">Cours & Révisions</span></li>
+              <li><span className="hover:text-[#4AA3A2] transition-colors cursor-pointer">Électronique</span></li>
+              <li><span className="hover:text-[#4AA3A2] transition-colors cursor-pointer">Mode & Accessoires</span></li>
+              <li><span className="hover:text-[#4AA3A2] transition-colors cursor-pointer">Services</span></li>
             </ul>
           </div>
 

@@ -34,7 +34,7 @@ export default function CategoryNotFound() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center">
-      <p className="text-6xl font-bold text-[#D4A017]">404</p>
+      <p className="text-6xl font-bold text-[#4AA3A2]">404</p>
       <h1 className="text-2xl font-semibold text-foreground">
         {loading
           ? "Chargement..."

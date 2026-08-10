@@ -90,14 +90,14 @@ export default function CarteScolairePage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="flex flex-col gap-4">
-            <div className="rounded-lg bg-[#D4A017]/10 border border-[#D4A017]/20 px-4 py-3 text-sm text-[#D4A017]">
+            <div className="rounded-lg bg-[#4AA3A2]/10 border border-[#4AA3A2]/20 px-4 py-3 text-sm text-[#4AA3A2]">
               <span className="font-semibold">Confidentiel :</span> votre pièce d&apos;identité
               sert uniquement à vérifier votre identité. Elle n&apos;est
               jamais visible par les autres utilisateurs.
             </div>
 
             {user.cardStatus === "PENDING" && (
-              <Alert className="border-[#D4A017]/30 bg-[#D4A017]/10 text-[#D4A017]">
+              <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#4AA3A2]">
                 <AlertDescription>
                   Votre pièce d&apos;identité est en cours de vérification par un administrateur.
                 </AlertDescription>

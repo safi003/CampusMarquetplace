@@ -47,7 +47,7 @@ export default function LoginPage() {
     <AuthLayout>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {pendingInfo && (
-          <Alert className="border-[#D4A017]/30 bg-[#D4A017]/10 text-[#D4A017]">
+          <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#4AA3A2]">
             <AlertDescription>
               Compte créé. Votre pièce d&apos;identité est en attente de vérification : elle sera validée par
               un administrateur avant que vous puissiez publier des annonces.

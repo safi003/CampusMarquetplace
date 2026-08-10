@@ -111,7 +111,7 @@ export default function CreateProductPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="flex flex-col gap-4">
-            <div className="rounded-lg bg-[#D4A017]/10 border border-[#D4A017]/20 px-4 py-3 text-sm text-[#D4A017]">
+            <div className="rounded-lg bg-[#4AA3A2]/10 border border-[#4AA3A2]/20 px-4 py-3 text-sm text-[#4AA3A2]">
               <span className="font-semibold">Conseil :</span> Prenez plusieurs photos claires de votre article sous différents angles pour éviter toute confusion avec les acheteurs.
             </div>
             {error && (

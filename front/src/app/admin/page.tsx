@@ -34,7 +34,7 @@ function StatusBadge({ status }: { status: AdminUser["cardStatus"] }) {
       ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/30"
       : status === "REJECTED"
         ? "bg-red-500/10 text-red-700 border-red-500/30"
-        : "bg-[#D4A017]/10 text-[#B8860B] border-[#D4A017]/30";
+        : "bg-[#4AA3A2]/10 text-[#2F7372] border-[#4AA3A2]/30";
   return (
     <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium ${styles}`}>
       {statusLabels[status]}

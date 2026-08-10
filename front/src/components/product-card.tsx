@@ -34,10 +34,10 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
-            <p className="text-lg font-bold text-[#D4A017]">{product.price} FCFA</p>
+            <p className="text-lg font-bold text-[#4AA3A2]">{product.price} FCFA</p>
             <p className="text-xs text-muted-foreground">{product.seller.name}</p>
           </div>
-          <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground transition-transform duration-300 group-hover:rotate-[-45deg] group-hover:bg-[#D4A017] group-hover:text-white">
+          <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground transition-transform duration-300 group-hover:rotate-[-45deg] group-hover:bg-[#4AA3A2] group-hover:text-white">
             <ArrowRight className="w-4 h-4" />
           </div>
         </div>

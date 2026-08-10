@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 function BrandPanel() {
   return (
-    <div className="relative hidden overflow-hidden bg-gradient-to-br from-[#D4A017] via-[#C49215] to-[#A67B12] lg:flex lg:min-h-full lg:items-center lg:justify-center">
+    <div className="relative hidden overflow-hidden bg-gradient-to-br from-[#4AA3A2] via-[#388C8B] to-[#2A6B6A] lg:flex lg:min-h-full lg:items-center lg:justify-center">
       <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
       <div className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-white/10" />
       <div className="pointer-events-none absolute -bottom-32 -left-32 size-[500px] rounded-full bg-white/10" />

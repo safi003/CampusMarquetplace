@@ -70,7 +70,7 @@ export default function ReviewForm({ sellerId, onReviewAdded }: ReviewFormProps)
             className="text-2xl transition-colors"
           >
             {star <= (hover || rating) ? (
-              <span className="text-[#D4A017]">&#9733;</span>
+              <span className="text-[#4AA3A2]">&#9733;</span>
             ) : (
               <span className="text-gray-300">&#9733;</span>
             )}
@@ -91,7 +91,7 @@ export default function ReviewForm({ sellerId, onReviewAdded }: ReviewFormProps)
       <button
         type="submit"
         disabled={loading}
-        className="rounded-lg bg-[#D4A017] px-4 py-2 text-sm font-medium text-white hover:bg-[#D4A017]/90 disabled:opacity-50"
+        className="rounded-lg bg-[#4AA3A2] px-4 py-2 text-sm font-medium text-white hover:bg-[#4AA3A2]/90 disabled:opacity-50"
       >
         {loading ? "Envoi..." : "Publier l'avis"}
       </button>
