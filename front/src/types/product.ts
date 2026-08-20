@@ -5,6 +5,7 @@ export interface Product {
   price: number;
   address: string;
   isSold: boolean;
+  handDelivery: boolean;
   createdAt: string;
   images: { id: number; url: string }[]; // remplace image: string | null
   seller: { id: number; name: string };

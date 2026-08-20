@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
+import { apiFetch } from "@/app/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +19,7 @@ import {
 
 export default function CarteScolairePage() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -50,9 +51,8 @@ export default function CarteScolairePage() {
     formData.append("imageCarteScolaire", file);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/carte`, {
+      const res = await apiFetch(`/auth/carte`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -72,8 +72,8 @@ export default function CarteScolairePage() {
 
       setSuccess(true);
       setFile(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
     }

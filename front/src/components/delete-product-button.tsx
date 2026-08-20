@@ -1,5 +1,5 @@
 "use client"
-
+import { apiFetch } from "@/app/lib/api"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
@@ -12,15 +12,18 @@ interface DeleteProductButtonProps {
 
 export function DeleteProductButton({ productId, sellerId }: DeleteProductButtonProps) {
   const [open, setOpen] = useState(false)
-  const { user, token } = useAuth()
+  const { user } = useAuth()
   const router = useRouter()
 
   if (!user || user.id !== sellerId) return null
 
   async function handleDelete() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
+    //   method: "DELETE",
+    //   headers: { Authorization: `Bearer ${token}` },
+    // })
+    const res = await apiFetch(`/products/${productId}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
     })
 
     if (res.ok) {

@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShoppingCart, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
+import BuyButton from "@/components/buy-button";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import WishlistButton from "@/components/wishlistButton";
 import { DeleteProductButton } from "@/components/delete-product-button";
 import { EditProductButton } from "@/components/edit-product-button";
-
+import RatingSummary from "@/components/rating-summary";
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +15,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+
+interface Review {
+  id: number;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  reviewer: { id: number; name: string };
+}
+
+interface ReviewsData {
+  reviews: Review[];
+  averageRating: number;
+  totalReviews: number;
+}
 
 async function getProduct(id: string): Promise<Product | null> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
@@ -31,6 +46,14 @@ async function getProduct(id: string): Promise<Product | null> {
   return res.json();
 }
 
+async function getReviews(id: string): Promise<ReviewsData> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/${id}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) return { reviews: [], averageRating: 0, totalReviews: 0 };
+  return res.json();
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -43,8 +66,10 @@ export default async function ProductDetailPage({
     notFound();
   }
 
+  const reviewsData = await getReviews(String(product.seller.id));
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6 pb-24 md:pb-6">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Galerie d'images - Carousel */}
         <div className="md:w-2/3">
@@ -73,43 +98,96 @@ export default async function ProductDetailPage({
 
             <p>{product.description}</p>
             <p className="text-gray-500">📍 {product.address}</p>
-            <p className="text-sm text-gray-400">Vendu par <Link href={`/sellers/${product.seller.id}`} className="hover:text-[#4AA3A2] hover:underline">{product.seller.name}</Link></p>
-          </div>
-        </div>
-
-        {/* Profil du vendeur + actions */}
-        <div className="md:w-1/3 self-start flex flex-col gap-5 rounded-xl border border-border bg-card p-5 max-h-80 overflow-y-auto">
-         
-          {/* Profil du vendeur */}
-          <Link
-            href={`/sellers/${product.seller.id}`}
-            className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-colors hover:bg-muted"
-          >
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#4AA3A2]/15 text-[#4AA3A2] font-semibold">
-              {product.seller.name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm font-semibold">{product.seller.name}</p>
-              <p className="text-xs text-muted-foreground">Voir le profil du vendeur</p>
-            </div>
-          </Link>
-
-          <div className="flex flex-col gap-2.5">
-            <Button size="lg" className="w-full">
-              <ShoppingCart />
-              Acheter
-            </Button>
-            <Button size="lg" variant="outline" className="w-full">
-              <MessageCircle />
-              Chat avec le vendeur
-            </Button>
+            <p className="text-sm text-gray-400">
+              Vendu par{" "}
+              <Link
+                href={`/sellers/${product.seller.id}`}
+                className="hover:text-[#4AA3A2] hover:underline"
+              >
+                {product.seller.name}
+              </Link>
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
             <WishlistButton productId={product.id} />
-            <DeleteProductButton productId={product.id} sellerId={product.seller.id} />
-            <EditProductButton productId={product.id} sellerId={product.seller.id} />
+            <DeleteProductButton
+              productId={product.id}
+              sellerId={product.seller.id}
+            />
+            <EditProductButton
+              productId={product.id}
+              sellerId={product.seller.id}
+            />
           </div>
+        </div>
+
+        {/* Séparateur mobile */}
+        <hr className="border-border md:hidden my-4 min" />
+
+        {/* Profil du vendeur + actions */}
+        <div className="md:w-1/3 self-start flex flex-col gap-5 rounded-xl border border-border bg-card p-5 max-h-80 overflow-y-auto">
+          {/* Profil du vendeur */}
+          <div className="flex flex-col gap-3">
+            <Link
+              href={`/sellers/${product.seller.id}`}
+              className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-colors hover:bg-muted"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#4AA3A2]/15 text-[#4AA3A2] font-semibold">
+                {product.seller.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{product.seller.name}</p>
+<div className="px-1">
+              <RatingSummary
+                averageRating={reviewsData.averageRating}
+                totalReviews={reviewsData.totalReviews}
+              />
+            </div>
+              </div>
+            </Link>
+          </div>
+
+          <div className="hidden md:flex flex-col gap-2.5">
+            {product.isSold ? (
+              <div className="rounded-lg bg-muted px-4 py-3 text-center text-sm font-medium text-muted-foreground">
+                Vendu
+              </div>
+            ) : (
+              <BuyButton productId={product.id} />
+            )}
+            <Link href={`/chat/${product.seller.id}`} className="w-full">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full text-primary"
+              >
+                <MessageCircle />
+                Chat avec le vendeur
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Barre d'actions fixe en bas - mobile uniquement */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background p-3 md:hidden">
+        <div className="flex gap-2.5">
+          {product.isSold ? (
+            <div className="flex-1 rounded-lg bg-muted px-4 py-3 text-center text-sm font-medium text-muted-foreground">
+              Vendu
+            </div>
+          ) : (
+            <div className="flex-1">
+              <BuyButton productId={product.id} />
+            </div>
+          )}
+          <Link href={`/chat/${product.seller.id}`} className="flex-1">
+            <Button size="lg" variant="outline" className="w-full text-primary">
+              <MessageCircle />
+              Chat avec le vendeur
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

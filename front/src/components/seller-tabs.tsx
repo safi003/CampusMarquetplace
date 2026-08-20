@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import StarRating from "@/components/star-rating";
+import RatingSummary from "@/components/rating-summary";
 import ReviewFormWrapper from "@/components/review-form-wrapper";
 import { Product } from "@/types/product";
 
@@ -69,11 +70,11 @@ export default function SellerTabs({
             <p className="text-sm text-muted-foreground">
               {seller ? <MemberSince date={seller.createdAt} /> : ""}
             </p>
-            <div className="flex items-center gap-2 mt-1">
-              <StarRating rating={reviewsData.averageRating} />
-              <span className="text-sm text-muted-foreground">
-                ({reviewsData.totalReviews} avis)
-              </span>
+            <div className="mt-1">
+              <RatingSummary
+                averageRating={reviewsData.averageRating}
+                totalReviews={reviewsData.totalReviews}
+              />
             </div>
           </div>
           <div className="text-right">

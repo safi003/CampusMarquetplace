@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { apiFetch } from "@/app/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,7 +73,7 @@ export default function AdminPage() {
 
   const loadUsers = useCallback(async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
+      const res = await apiFetch(`/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -98,17 +99,14 @@ export default function AdminPage() {
     setError("");
     try {
       const body = decision === "reject" ? { reason } : undefined;
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/users/${id}/${decision}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...(body ? { "Content-Type": "application/json" } : {}),
-          },
-          ...(body ? { body: JSON.stringify(body) } : {}),
-        }
-      );
+      const res = await apiFetch(`/admin/users/${id}/${decision}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(body ? { "Content-Type": "application/json" } : {}),
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(

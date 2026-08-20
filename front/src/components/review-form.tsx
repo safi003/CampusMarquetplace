@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiFetch } from "@/app/lib/api";
 
 interface ReviewFormProps {
   sellerId: number;
@@ -31,12 +32,9 @@ export default function ReviewForm({ sellerId, onReviewAdded }: ReviewFormProps)
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/${sellerId}`, {
+      const res = await apiFetch(`/reviews/${sellerId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating, comment: comment || undefined }),
       });
 
@@ -48,8 +46,8 @@ export default function ReviewForm({ sellerId, onReviewAdded }: ReviewFormProps)
       setRating(0);
       setComment("");
       onReviewAdded();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
     }

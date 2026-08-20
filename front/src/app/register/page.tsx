@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { registerRequest } from "@/app/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,32 +24,11 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("password", password);
-    if (carte) {
-      formData.append("imageCarteScolaire", carte);
-    }
-
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        const msg =
-          data.message ||
-          Object.values(data.errors || {}).flat().join(", ") ||
-          "Erreur lors de l'inscription";
-        throw new Error(msg);
-      }
-
-      router.push(carte ? "/login?verify=1" : "/login");
-    } catch (err: any) {
-      setError(err.message);
+      await registerRequest(name, email, password, carte || undefined);
+      router.push(`/login?verify=true`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { getSafeRedirect } from "@/lib/safe-redirect";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,9 +36,9 @@ export default function LoginPage() {
     try {
       const data = await loginRequest(email, password);
       login(data.user, data.token);
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+      router.push(getSafeRedirect());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
     }

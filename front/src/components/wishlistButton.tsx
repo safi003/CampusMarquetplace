@@ -1,42 +1,47 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "@/contexts/auth-context";
+import { apiFetch } from "@/app/lib/api";
 
 export default function WishlistButton({ productId }: { productId: number }) {
+  const { token } = useAuth();
   const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showLoginHint, setShowLoginHint] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      setLiked(false);
+      return;
+    }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    apiFetch(`/wishlist`)
       .then((res) => {
         if (!res.ok) return;
         return res.json();
       })
       .then((items) => {
         if (Array.isArray(items)) {
-          setLiked(items.some((item: any) => item.productId === productId));
+          setLiked(items.some((item: { productId: number }) => item.productId === productId));
         }
       })
       .catch(() => {});
-  }, [productId]);
+  }, [productId, token]);
 
   async function handleClick() {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      setShowLoginHint(true);
+      setTimeout(() => setShowLoginHint(false), 3000);
+      return;
+    }
 
     setLoading(true);
 
     try {
       const method = liked ? "DELETE" : "POST";
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/wishlist/${productId}`,
-        { method, headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await apiFetch(`/wishlist/${productId}`, { method });
 
       if (res.ok) {
         setLiked(!liked);
@@ -48,13 +53,23 @@ export default function WishlistButton({ productId }: { productId: number }) {
   }
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={loading}
-      className="text-3xl transition-colors duration-200 hover:scale-110 disabled:opacity-50"
-      title={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
-    >
-      {liked ? "♥" : "♡"}
-    </button>
+    <div className="flex flex-col items-start gap-2">
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="text-3xl transition-colors duration-200 hover:scale-110 disabled:opacity-50"
+        title={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+      >
+        {liked ? "♥" : "♡"}
+      </button>
+      {showLoginHint && (
+        <p className="text-sm text-muted-foreground">
+          Connectez-vous pour ajouter aux favoris.{" "}
+          <Link href="/login" className="font-semibold text-[#4AA3A2] underline underline-offset-2">
+            Se connecter
+          </Link>
+        </p>
+      )}
+    </div>
   );
 }

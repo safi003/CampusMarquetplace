@@ -46,7 +46,7 @@ export async function getMyWishlist(req: Request, res: Response) {
       where: { userId: req.user!.id },
       include: {
         product: {
-          include: { category: true, seller: { select: { id: true, name: true } } },
+          include: { images: true, category: true, seller: { select: { id: true, name: true } } },
         },
       },
       orderBy: { createdAt: "desc" },

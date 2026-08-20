@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { apiFetch } from "@/app/lib/api";
 
 interface Category {
   id: number;
@@ -31,6 +32,7 @@ export default function CreateProductPage() {
   const [address, setAddress] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [handDelivery, setHandDelivery] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -69,13 +71,12 @@ export default function CreateProductPage() {
     formData.append("price", price);
     formData.append("categoryId", categoryId);
     formData.append("address", address);
+    formData.append("handDelivery", String(handDelivery));
     files.forEach((file) => formData.append("images", file));
 
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
+      const res = await apiFetch(`/products`, {
         method: "POST",
-        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
         body: formData,
       });
 
@@ -95,8 +96,8 @@ export default function CreateProductPage() {
       }
 
       router.push(`/products/${data.id}`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
     }
@@ -177,6 +178,18 @@ export default function CreateProductPage() {
                   ))}
                 </select>
               </div>
+               <div className="flex items-center gap-2">
+              <input
+                id="handDelivery"
+                type="checkbox"
+                checked={handDelivery}
+                onChange={(e) => setHandDelivery(e.target.checked)}
+                className="h-4 w-4 accent-[#4AA3A2]"
+              />
+              <Label htmlFor="handDelivery">
+                J&apos;accepte la remise en main propre
+              </Label>
+            </div>
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="images">Photos (max 5)</Label>

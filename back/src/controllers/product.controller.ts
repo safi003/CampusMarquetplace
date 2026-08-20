@@ -9,7 +9,7 @@ export async function createProduct(req: Request, res: Response) {
     if (!parsed.success) {
       return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
     }
-    const { name, description, price, categoryId, address } = parsed.data;
+    const { name, description, price, categoryId, address, handDelivery } = parsed.data;
 
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) {
@@ -35,6 +35,7 @@ export async function createProduct(req: Request, res: Response) {
         description,
         price,
         address,
+        handDelivery,
         categoryId,
         sellerId: req.user!.id,
       },
@@ -151,7 +152,7 @@ export async function updateProduct(req: Request, res: Response) {
       return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce produit" });
     }
 
-    const { name, description, price, categoryId, address } = req.body;
+    const { name, description, price, categoryId, address,  handDelivery} = req.body;
 
     const updated = await prisma.product.update({
       where: { id },
@@ -161,6 +162,7 @@ export async function updateProduct(req: Request, res: Response) {
         ...(price !== undefined && { price: Number(price) }),
         ...(categoryId !== undefined && { categoryId: Number(categoryId) }),
         ...(address !== undefined && { address }),
+        ...(handDelivery !== undefined && { handDelivery: handDelivery === true || handDelivery === "true" }),
       },
     });
 

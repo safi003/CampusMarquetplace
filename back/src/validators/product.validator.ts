@@ -6,4 +6,8 @@ export const createProductSchema = z.object({
   price: z.coerce.number().positive("Le prix doit être positif"),
   categoryId: z.coerce.number().int().positive("Catégorie invalide"),
   address: z.string().min(5, "L'adresse doit contenir au moins 5 caractères"),
+  handDelivery: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((v) => v === true || v === "true"),
 });

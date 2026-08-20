@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User, LogOut, Search, Heart, PlusCircle, Smartphone, BookOpen, Shirt, Sofa, Bike, Utensils, Dumbbell, Laptop, Music, Ellipsis, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import MessagesNavLink from "@/components/messages-nav-link";
 import {
   Navbar,
   NavBody,
@@ -87,6 +88,7 @@ export default function MainNav() {
               <Heart className="h-4 w-4" />
               Favoris
             </Link>
+            {user && <MessagesNavLink className="px-4 py-2" />}
           </nav>
 
           <form onSubmit={handleSearch} className="relative hidden lg:block z-10">
@@ -170,6 +172,11 @@ export default function MainNav() {
               <Heart className="h-4 w-4" />
               Favoris
             </a>
+            {user && (
+              <div onClick={() => setIsOpen(false)}>
+                <MessagesNavLink className="px-0" />
+              </div>
+            )}
             <div className="flex w-full flex-col gap-2 pt-4">
               <NavbarButton href={user ? "/products" : "/login"} variant="primary" className="w-full">
                 <PlusCircle className="h-4 w-4 mr-1 inline" />

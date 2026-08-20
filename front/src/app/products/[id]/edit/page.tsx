@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuth } from "@/contexts/auth-context"
+import { apiFetch } from "@/app/lib/api"
 
 interface Category {
   id: number
@@ -32,6 +33,7 @@ export default function EditProductPage() {
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
   const [address, setAddress] = useState("")
+  const [handDelivery, setHandDelivery] = useState(false);
   const [categoryId, setCategoryId] = useState("")
   const [categories, setCategories] = useState<Category[]>([])
   const [error, setError] = useState("")
@@ -59,6 +61,7 @@ export default function EditProductPage() {
         setDescription(product.description)
         setPrice(String(product.price))
         setAddress(product.address)
+        setHandDelivery(product.handDelivery);
         setCategoryId(String(product.category.id))
       })
       .catch(() => router.push("/"))
@@ -71,18 +74,16 @@ export default function EditProductPage() {
     setLoading(true)
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
+      const res = await apiFetch(`/products/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           description,
           price,
           categoryId,
           address,
+          handDelivery,
         }),
       })
 
@@ -93,8 +94,8 @@ export default function EditProductPage() {
 
       router.push(`/products/${id}`)
       router.refresh()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue")
     } finally {
       setLoading(false)
     }
@@ -148,6 +149,18 @@ export default function EditProductPage() {
                   ))}
                 </select>
               </div>
+            </div>
+             <div className="flex items-center gap-2">
+              <input
+                id="handDelivery"
+                type="checkbox"
+                checked={handDelivery}
+                onChange={(e) => setHandDelivery(e.target.checked)}
+                className="h-4 w-4 accent-[#4AA3A2]"
+              />
+              <Label htmlFor="handDelivery">
+                J&apos;accepte la remise en main propre
+              </Label>
             </div>
           </CardContent>
           <CardFooter>

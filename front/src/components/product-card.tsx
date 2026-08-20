@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
-  const imageUrl = product.images[0]
+  const imageUrl = product.images?.[0]
     ? `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${product.images[0].url}`
     : null;
 

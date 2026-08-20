@@ -263,3 +263,6 @@ Deux précisions importantes :
 - Aucune vérification Google n'est requise dans ton cas : on n'utilise que le "Sign in with Google" (identité : email + profil). La vérification (review) ne concerne que les applications qui demandent des accès sensibles (lire les emails, accéder aux fichiers Google, etc.). Ton app peut passer en production immédiatement.
 - Après publication, la liste des "Test users" ne s'applique plus : n'importe quel compte Google pourra se connecter.
 Pour que le bouton continue de marcher en ligne, pense aussi à ajouter ton URL de production dans APIs & Services → Credentials → ta "Web client" → Authorized JavaScript origins (et Authorized redirect URIs si besoin).
+
+PREVUUUUUUUUUUU DEEEEEEEEE FAIIIIIIIIIIRE APRESSSSSSSSSSSSSS
+Ajouter un BFF backend for frontend pour la securiter plus tart

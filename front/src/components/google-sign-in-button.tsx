@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-
+import { getSafeRedirect } from "@/lib/safe-redirect";
 declare global {
   interface Window {
     google?: {
@@ -56,7 +56,7 @@ export function GoogleSignInButton({ onError }: GoogleSignInButtonProps) {
         }
 
         login(data.user, data.token);
-        router.push("/");
+        router.push(getSafeRedirect());
       } catch (err) {
         onError?.(err instanceof Error ? err.message : "Erreur lors de la connexion Google");
       }

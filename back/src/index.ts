@@ -10,8 +10,12 @@ import reviewRoutes from "./routes/review.routes";
 import userRoutes from "./routes/user.routes";
 import adminRoutes from "./routes/admin.routes";
 import { getFileStream } from "./lib/storage";
-
+import orderRoutes from "./routes/order.routes";
 import path from "path";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { setupSocket } from "./socket";
+import messageRoutes from "./routes/message.routes";
 
 
 const app = express();
@@ -47,7 +51,15 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/sellers", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/messages", messageRoutes);
 
-app.listen(PORT, () => {
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: { origin: allowedOrigins, credentials: true },
+});
+setupSocket(io);
+
+httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

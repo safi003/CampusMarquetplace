@@ -145,17 +145,18 @@ const Text3DFlip = ({
     isAnimatingRef.current = true
 
     try {
-      const totalChars = characters.reduce(
-        (sum, word) => sum + word.characters.length,
-        0
-      )
+      const element = scope.current
+      if (!element) return
+
+      const charElements = element.querySelectorAll(".text-3d-flip-char")
+      const totalChars = charElements.length
 
       const delays = Array.from({ length: totalChars }, (_, i) =>
         getStaggerDelay(i, totalChars)
       )
 
       await animate(
-        ".text-3d-flip-char",
+        charElements,
         { transform: rotationTransform },
         {
           ...transition,
@@ -166,7 +167,7 @@ const Text3DFlip = ({
       if (!isMountedRef.current) return
 
       await animate(
-        ".text-3d-flip-char",
+        charElements,
         { transform: "rotateX(0deg) rotateY(0deg)" },
         { duration: 0 }
       )
@@ -175,7 +176,7 @@ const Text3DFlip = ({
         isAnimatingRef.current = false
       }
     }
-  }, [characters, transition, getStaggerDelay, rotationTransform, animate])
+  }, [transition, getStaggerDelay, rotationTransform, animate])
 
   return (
     <ElementTag
