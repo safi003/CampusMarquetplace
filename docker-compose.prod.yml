@@ -1,0 +1,58 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: campus-place
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - back
+    restart: unless-stopped
+
+  back:
+    build:
+      context: ./back
+    container_name: campus-back
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      RUSTFS_ENDPOINT: http://rustfs:9000
+      RUSTFS_REGION: ${RUSTFS_REGION:-us-east-1}
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
+      RUSTFS_BUCKET: ${RUSTFS_BUCKET:-campus-marketplace}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    command: sh -c "npx prisma migrate deploy && npm run start"
+    depends_on:
+      - rustfs
+    restart: unless-stopped
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs-server
+    # Pas de ports exposes : accessible uniquement en interne par le back.
+    # Le back sert les fichiers au public via /uploads/:dir/:file (src/index.ts:33).
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ENABLE: "false"
+      RUSTFS_OBS_LOGGER_LEVEL: error
+    volumes:
+      - rustfs_data:/data
+    restart: unless-stopped
+
+volumes:
+  rustfs_data:
+  caddy_data:
+  caddy_config:

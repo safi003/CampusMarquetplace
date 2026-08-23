@@ -1,0 +1,10 @@
+# Secrets / environnements (racine)
+.env.prod
+.env
+
+# Vercel
+.vercel/
+
+# Fichiers OS
+Thumbs.db
+.DS_Store

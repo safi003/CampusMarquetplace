@@ -12,10 +12,7 @@ export default function WishlistButton({ productId }: { productId: number }) {
   const [showLoginHint, setShowLoginHint] = useState(false);
 
   useEffect(() => {
-    if (!token) {
-      setLiked(false);
-      return;
-    }
+    if (!token) return;
 
     apiFetch(`/wishlist`)
       .then((res) => {

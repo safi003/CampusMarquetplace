@@ -17,10 +17,18 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Environnement
 .env
+
+# Prisma (genere)
 /src/generated/prisma
+
+# Fichiers uploades (stockes dans RustFS, jamais dans git)
+uploads

@@ -266,3 +266,4 @@ Pour que le bouton continue de marcher en ligne, pense aussi à ajouter ton URL 
 
 PREVUUUUUUUUUUU DEEEEEEEEE FAIIIIIIIIIIRE APRESSSSSSSSSSSSSS
 Ajouter un BFF backend for frontend pour la securiter plus tart
+ajouter Nginx dans le deployemnet oracle
