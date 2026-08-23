@@ -8,3 +8,7 @@
 # Fichiers OS
 Thumbs.db
 .DS_Store
+
+# Local uniquement
+RECAP_GOOGLE_LOGIN.txt
+front-old-vite/
