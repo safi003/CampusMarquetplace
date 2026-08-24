@@ -9,6 +9,7 @@ import categoryRoutes from "./routes/category.routes";
 import reviewRoutes from "./routes/review.routes";
 import userRoutes from "./routes/user.routes";
 import adminRoutes from "./routes/admin.routes";
+import notificationRoutes from "./routes/notification.routes";
 import { getFileStream } from "./lib/storage";
 import orderRoutes from "./routes/order.routes";
 import path from "path";
@@ -53,12 +54,14 @@ app.use("/api/sellers", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: allowedOrigins, credentials: true },
 });
 setupSocket(io);
+app.set("io", io);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

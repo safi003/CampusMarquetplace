@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import prisma from "./lib/prisma";
+import { notifyUser } from "./lib/notify";
 
 export function setupSocket(io: Server) {
   io.use((socket, next) => {
@@ -50,6 +51,21 @@ export function setupSocket(io: Server) {
         });
 
         io.to(`user:${receiverId}`).emit("message:new", message);
+
+        // Notifie le destinataire quand le message provient d'un administrateur
+        const sender = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true },
+        });
+        if (sender?.role === "ADMIN") {
+          await notifyUser(io, {
+            userId: receiverId,
+            type: "ADMIN_MESSAGE",
+            content: "Un administrateur vous a envoyé un message.",
+            link: "/chat",
+          });
+        }
+
         ack?.({ ok: true, message });
       } catch (error) {
         console.error(error);

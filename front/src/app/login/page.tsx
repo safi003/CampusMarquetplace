@@ -50,8 +50,7 @@ export default function LoginPage() {
         {pendingInfo && (
           <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#4AA3A2]">
             <AlertDescription>
-              Compte créé. Votre pièce d&apos;identité est en attente de vérification : elle sera validée par
-              un administrateur avant que vous puissiez publier des annonces.
+              Votre compte sera vérifié par un administrateur avant de pouvoir publier des annonces.
             </AlertDescription>
           </Alert>
         )}

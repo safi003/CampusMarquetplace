@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import type { Server } from "socket.io";
 import prisma from "../lib/prisma";
+import { notifyUser } from "../lib/notify";
 import { z } from "zod";
 
 const rejectSchema = z.object({
@@ -62,6 +64,15 @@ export async function approveCard(req: Request, res: Response) {
       data: { cardStatus: "APPROVED", cardRejectionReason: null },
     });
 
+    const io = req.app.get("io") as Server | undefined;
+    await notifyUser(io, {
+      userId: user.id,
+      type: "CARD_APPROVED",
+      content:
+        "Bonne nouvelle ! Votre pièce d'identité a été validée. Vous pouvez désormais vendre sur la plateforme.",
+      link: "/carte-scolaire",
+    });
+
     const { password: _, ...publicUser } = user;
     return res.json(publicUser);
   } catch (error) {
@@ -81,6 +92,14 @@ export async function rejectCard(req: Request, res: Response) {
     const user = await prisma.user.update({
       where: { id: userId },
       data: { cardStatus: "REJECTED", cardRejectionReason: parsed.data.reason },
+    });
+
+    const io = req.app.get("io") as Server | undefined;
+    await notifyUser(io, {
+      userId: user.id,
+      type: "CARD_REJECTED",
+      content: `Votre pièce d'identité a été refusée : ${parsed.data.reason}. Merci d'en soumettre une nouvelle.`,
+      link: "/carte-scolaire",
     });
 
     const { password: _, ...publicUser } = user;

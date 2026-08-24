@@ -6,6 +6,7 @@ import { useState } from "react";
 import { User, LogOut, Search, Heart, PlusCircle, Smartphone, BookOpen, Shirt, Sofa, Bike, Utensils, Dumbbell, Laptop, Music, Ellipsis, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import MessagesNavLink from "@/components/messages-nav-link";
+import NotificationsNavLink from "@/components/notifications-nav-link";
 import {
   Navbar,
   NavBody,
@@ -53,6 +54,13 @@ export default function MainNav() {
     }
   }
 
+  // Non connecté -> connexion ; sans pièce d'identité valide -> carte scolaire ; sinon publication
+  const publishHref = !user
+    ? "/login"
+    : !user.imageCarteScolaire || user.cardStatus === "REJECTED"
+      ? "/carte-scolaire"
+      : "/products";
+
   return (
     <>
     <div className="sticky top-0 z-50">
@@ -89,6 +97,7 @@ export default function MainNav() {
               Favoris
             </Link>
             {user && <MessagesNavLink className="px-4 py-2" />}
+            {user && <NotificationsNavLink className="px-4 py-2" />}
           </nav>
 
           <form onSubmit={handleSearch} className="relative hidden lg:block z-10">
@@ -103,7 +112,7 @@ export default function MainNav() {
           </form>
 
           <div className="flex items-center gap-2 relative z-10">
-            <NavbarButton href={user ? "/products" : "/login"} variant="primary">
+            <NavbarButton href={publishHref} variant="primary">
               <PlusCircle className="h-4 w-4 mr-1 inline" />
               Déposer une annonce
             </NavbarButton>
@@ -177,8 +186,13 @@ export default function MainNav() {
                 <MessagesNavLink className="px-0" />
               </div>
             )}
+            {user && (
+              <div onClick={() => setIsOpen(false)}>
+                <NotificationsNavLink className="px-0" />
+              </div>
+            )}
             <div className="flex w-full flex-col gap-2 pt-4">
-              <NavbarButton href={user ? "/products" : "/login"} variant="primary" className="w-full">
+              <NavbarButton href={publishHref} variant="primary" className="w-full">
                 <PlusCircle className="h-4 w-4 mr-1 inline" />
                 Déposer une annonce
               </NavbarButton>

@@ -93,21 +93,6 @@ export default function RegisterPage() {
               className="h-10"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="carte" className="text-sm font-medium text-foreground">
-              Pièce d&apos;identité <span className="font-normal text-muted-foreground">(recommandé)</span>
-            </Label>
-            <Input
-              id="carte"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setCarte(e.target.files?.[0] || null)}
-              className="h-10 file:mr-2 file:h-6 file:rounded-md file:border-0 file:bg-primary file:px-3 file:text-xs file:font-medium file:text-primary-foreground file:hover:bg-primary/90"
-            />
-            <p className="text-xs text-muted-foreground">
-              Votre compte sera vérifié par un administrateur avant de pouvoir publier des annonces.
-            </p>
-          </div>
         </div>
 
         <Button type="submit" className="h-10 w-full text-sm font-semibold" disabled={loading}>

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiFetch } from "@/app/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Category {
   id: number;
@@ -26,6 +27,7 @@ interface Category {
 
 export default function CreateProductPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -36,6 +38,17 @@ export default function CreateProductPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    // Non connecté -> connexion ; sans pièce d'identité valide -> carte scolaire
+    if (!localStorage.getItem("token")) {
+      router.replace("/login");
+      return;
+    }
+    if (user && (!user.imageCarteScolaire || user.cardStatus === "REJECTED")) {
+      router.replace("/carte-scolaire");
+    }
+  }, [user, router]);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)

@@ -19,7 +19,7 @@ import {
 
 export default function CarteScolairePage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -61,17 +61,12 @@ export default function CarteScolairePage() {
         throw new Error(data.message || "Erreur lors de l'envoi de la carte");
       }
 
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
-        const parsed = JSON.parse(savedUser);
-        parsed.imageCarteScolaire = data.imageCarteScolaire;
-        parsed.cardStatus = data.cardStatus;
-        parsed.cardRejectionReason = data.cardRejectionReason ?? null;
-        localStorage.setItem("user", JSON.stringify(parsed));
-      }
+      await refreshUser();
 
+      // Redirige vers le formulaire de publication après l'envoi
       setSuccess(true);
       setFile(null);
+      setTimeout(() => router.push("/products"), 1200);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
@@ -99,7 +94,7 @@ export default function CarteScolairePage() {
             {user.cardStatus === "PENDING" && (
               <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#4AA3A2]">
                 <AlertDescription>
-                  Votre pièce d&apos;identité est en cours de vérification par un administrateur.
+                  Votre pièce d&apos;identité sera verifier par un administrateur.
                 </AlertDescription>
               </Alert>
             )}

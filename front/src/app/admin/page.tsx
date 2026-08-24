@@ -62,8 +62,81 @@ function CardImageThumb({ user }: { user: AdminUser }) {
   );
 }
 
+interface UserRowProps {
+  user: AdminUser;
+  rank?: number;
+  busy: boolean;
+  showActions?: boolean;
+  onDecide: (id: number, decision: "approve" | "reject", reason?: string) => void | Promise<void>;
+  onRequestReject: (user: AdminUser) => void;
+}
+
+function UserRow({ user: u, rank, busy, showActions = false, onDecide, onRequestReject }: UserRowProps) {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center">
+      {rank !== undefined && (
+        <div className="flex w-8 items-center justify-center text-sm font-semibold text-muted-foreground">
+          {rank}
+        </div>
+      )}
+
+      <CardImageThumb user={u} />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-semibold">{u.name}</span>
+          <StatusBadge status={u.cardStatus} />
+          {u.role === "ADMIN" && (
+            <span className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+              Admin
+            </span>
+          )}
+        </div>
+        <span className="truncate text-sm text-muted-foreground">{u.email}</span>
+        {u.cardStatus === "REJECTED" && u.cardRejectionReason && (
+          <span className="mt-1 text-xs text-red-600">Motif du refus : {u.cardRejectionReason}</span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 text-sm">
+        <StarRating rating={u.averageRating} size="sm" />
+        <span className="font-semibold">{u.averageRating.toFixed(1)}</span>
+        <span className="text-muted-foreground">({u.totalReviews} avis)</span>
+      </div>
+
+      {showActions && (
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <span>{u.totalProducts} annonce(s)</span>
+          {u.imageCarteScolaire && u.cardStatus !== "APPROVED" && (
+            <div className="flex gap-2">
+              {u.cardStatus === "PENDING" && (
+                <>
+                  <Button size="sm" onClick={() => onDecide(u.id, "approve")} disabled={busy}>
+                    Approuver
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => onRequestReject(u)} disabled={busy}>
+                    Refuser
+                  </Button>
+                </>
+              )}
+              {u.cardStatus === "REJECTED" && (
+                <Button size="sm" onClick={() => onDecide(u.id, "approve")} disabled={busy}>
+                  Revalider
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+type Tab = "approuver" | "attente";
+
 export default function AdminPage() {
   const { user, token } = useAuth();
+  const [tab, setTab] = useState<Tab>("approuver");
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -137,92 +210,81 @@ export default function AdminPage() {
   }
 
   const pendingCount = users.filter((u) => u.cardStatus === "PENDING").length;
+  const pendingUsers = users.filter((u) => u.cardStatus !== "APPROVED");
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Administration</h1>
-        <p className="text-sm text-muted-foreground">
-          Utilisateurs classés par nombre d&apos;étoiles. {pendingCount} carte(s) en attente de vérification.
-        </p>
-      </div>
-
-      {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700">
-          {error}
+    <>
+      <div className="flex flex-col gap-6">
+        <div className="flex gap-1 border-b border-border">
+          <button
+            onClick={() => setTab("approuver")}
+            className={`px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
+              tab === "approuver"
+                ? "bg-card border border-border border-b-white text-foreground -mb-px"
+                : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+            }`}
+          >
+            Utilisateurs ({users.length})
+          </button>
+          <button
+            onClick={() => setTab("attente")}
+            className={`px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
+              tab === "attente"
+                ? "bg-card border border-border border-b-white text-foreground -mb-px"
+                : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+            }`}
+          >
+            Cartes à vérifier ({pendingCount})
+          </button>
         </div>
-      )}
 
-      <div className="flex flex-col gap-3">
-        {users.length === 0 && (
-          <div className="py-10 text-center text-muted-foreground">Aucun utilisateur.</div>
+        {error && (
+          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
         )}
 
-        {users.map((u, index) => (
-          <div
-            key={u.id}
-            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center"
-          >
-            <div className="flex w-8 items-center justify-center text-sm font-semibold text-muted-foreground">
-              {index + 1}
-            </div>
-
-            <CardImageThumb user={u} />
-
-            <div className="flex min-w-0 flex-1 flex-col">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold">{u.name}</span>
-                <StatusBadge status={u.cardStatus} />
-                {u.role === "ADMIN" && (
-                  <span className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
-                    Admin
-                  </span>
-                )}
-              </div>
-              <span className="truncate text-sm text-muted-foreground">{u.email}</span>
-              {u.cardStatus === "REJECTED" && u.cardRejectionReason && (
-                <span className="mt-1 text-xs text-red-600">Motif du refus : {u.cardRejectionReason}</span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 text-sm">
-              <StarRating rating={u.averageRating} size="sm" />
-              <span className="font-semibold">{u.averageRating.toFixed(1)}</span>
-              <span className="text-muted-foreground">({u.totalReviews} avis)</span>
-            </div>
-
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span>{u.totalProducts} annonce(s)</span>
-              {u.imageCarteScolaire && u.cardStatus !== "APPROVED" && (
-                <div className="flex gap-2">
-                  {u.cardStatus === "PENDING" && (
-                    <>
-                      <Button size="sm" onClick={() => decide(u.id, "approve")} disabled={busy}>
-                        Approuver
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          setActionUser(u);
-                          setRejectReason("");
-                        }}
-                        disabled={busy}
-                      >
-                        Refuser
-                      </Button>
-                    </>
-                  )}
-                  {u.cardStatus === "REJECTED" && (
-                    <Button size="sm" onClick={() => decide(u.id, "approve")} disabled={busy}>
-                      Revalider
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+        {tab === "approuver" && (
+          <div className="flex flex-col gap-3">
+            {users.length === 0 && (
+              <div className="py-10 text-center text-muted-foreground">Aucun utilisateur.</div>
+            )}
+            {users.map((u, index) => (
+              <UserRow
+                key={u.id}
+                user={u}
+                rank={index + 1}
+                busy={busy}
+                onDecide={decide}
+                onRequestReject={(u) => {
+                  setActionUser(u);
+                  setRejectReason("");
+                }}
+              />
+            ))}
           </div>
-        ))}
+        )}
+
+        {tab === "attente" && (
+          <div className="flex flex-col gap-3">
+            {pendingUsers.length === 0 && (
+              <div className="py-10 text-center text-muted-foreground">Aucune carte à vérifier.</div>
+            )}
+            {pendingUsers.map((u) => (
+              <UserRow
+                key={u.id}
+                user={u}
+                busy={busy}
+                showActions
+                onDecide={decide}
+                onRequestReject={(u) => {
+                  setActionUser(u);
+                  setRejectReason("");
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {actionUser && (
@@ -258,6 +320,6 @@ export default function AdminPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

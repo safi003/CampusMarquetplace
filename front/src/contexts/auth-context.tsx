@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { resetSocket } from "@/lib/socket";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { resetSocket, getSocket } from "@/lib/socket";
+import { apiFetch } from "@/app/lib/api";
 
 interface User {
   id: number;
@@ -18,6 +19,7 @@ interface AuthContextType {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,6 +39,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  const refreshUser = useCallback(async () => {
+    if (!localStorage.getItem("token")) return;
+    try {
+      const res = await apiFetch(`/auth/me`);
+      if (!res.ok) return;
+      const fresh = await res.json();
+      localStorage.setItem("user", JSON.stringify(fresh));
+      setUser(fresh);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    // Corrige une copie locale potentiellement périmée à chaque chargement
+    /* eslint-disable react-hooks/set-state-in-effect */
+    void refreshUser();
+    /* eslint-enable react-hooks/set-state-in-effect */
+
+    // Mise à jour instantanée quand l'admin valide/refuse la carte
+    const socket = getSocket();
+    const onNotification = (notification: { type?: string }) => {
+      if (notification?.type === "CARD_APPROVED" || notification?.type === "CARD_REJECTED") {
+        void refreshUser();
+      }
+    };
+    socket?.on("notification:new", onNotification);
+
+    return () => {
+      socket?.off("notification:new", onNotification);
+    };
+  }, [token, refreshUser]);
+
   function login(user: User, token: string) {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -53,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
