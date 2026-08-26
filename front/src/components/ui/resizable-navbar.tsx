@@ -10,7 +10,6 @@ import {
 
 import React, { useRef, useState } from "react";
 
-
 interface NavbarProps {
   children: React.ReactNode;
   className?: string;
@@ -152,7 +151,8 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
-        visible && "rounded-2xl bg-background/95 shadow-sm backdrop-blur-md dark:bg-neutral-950/95",
+        visible &&
+          "rounded-2xl bg-background/95 shadow-sm backdrop-blur-md dark:bg-neutral-950/95",
         className,
       )}
     >
@@ -256,7 +256,8 @@ export const NavbarButton = ({
   const variantStyles = {
     primary:
       "bg-[#172121] text-white shadow-lg shadow-[#172121]/15 hover:bg-[#273535]",
-    secondary: "border border-border bg-transparent text-foreground hover:border-primary hover:text-primary shadow-none",
+    secondary:
+      "border border-border bg-transparent text-foreground hover:border-primary hover:text-primary shadow-none",
     dark: "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     gradient:
       "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
