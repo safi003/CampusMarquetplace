@@ -23,36 +23,43 @@ export async function createOrder(req: Request, res: Response) {
     if (!product) {
       return res.status(404).json({ message: "Produit introuvable" });
     }
-    if (product.isSold) {
-      return res.status(400).json({ message: "Ce produit a déjà été vendu" });
-    }
     if (product.sellerId === req.user!.id) {
       return res
         .status(400)
         .json({ message: "Vous ne pouvez pas acheter votre propre produit" });
     }
 
-    const order = await prisma.order.create({
-      data: {
-        productId,
-        mode,
-        buyerId: req.user!.id,
-        sellerId: product.sellerId,
-      },
+    const order = await prisma.$transaction(async (tx) => {
+      const [updated, created] = await Promise.all([
+        tx.product.updateMany({
+          where: { id: productId, isSold: false },
+          data: { isSold: true },
+        }),
+        tx.order.create({
+          data: {
+            productId,
+            mode,
+            buyerId: req.user!.id,
+            sellerId: product.sellerId,
+          },
+        }),
+      ]);
+
+      if (updated.count === 0) {
+        throw new Error("ALREADY_SOLD");
+      }
+
+      return tx.order.findUnique({
+        where: { id: created.id },
+        include: orderInclude,
+      });
     });
 
-    await prisma.product.update({
-      where: { id: productId },
-      data: { isSold: true },
-    });
-
-    const created = await prisma.order.findUnique({
-      where: { id: order.id },
-      include: orderInclude,
-    });
-
-    return res.status(201).json(created);
+    return res.status(201).json(order);
   } catch (error) {
+    if (error instanceof Error && error.message === "ALREADY_SOLD") {
+      return res.status(400).json({ message: "Ce produit a déjà été vendu" });
+    }
     console.error(error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
@@ -93,21 +100,19 @@ export async function updateOrderStatus(req: Request, res: Response) {
         .json({ message: "Vous ne participez pas à cette commande" });
     }
 
-    if (status === "CANCELLED" && order.status === "PENDING") {
-      await prisma.product.update({
-        where: { id: order.productId },
-        data: { isSold: false },
+    const updated = await prisma.$transaction(async (tx) => {
+      if (status === "CANCELLED" && order.status === "PENDING") {
+        await tx.product.update({
+          where: { id: order.productId },
+          data: { isSold: false },
+        });
+      }
+
+      return tx.order.update({
+        where: { id },
+        data: { status },
+        include: orderInclude,
       });
-    }
-
-    await prisma.order.update({
-      where: { id },
-      data: { status },
-    });
-
-    const updated = await prisma.order.findUnique({
-      where: { id },
-      include: orderInclude,
     });
 
     return res.status(200).json(updated);

@@ -1,3 +1,5 @@
+import { resetSocket } from "@/lib/socket";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
@@ -10,6 +12,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   if (res.status === 401) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    resetSocket();
     window.location.href =
       "/login?redirect=" + encodeURIComponent(window.location.pathname);
     throw new Error("Session expirée");

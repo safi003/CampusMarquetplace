@@ -57,6 +57,7 @@ export async function register(req: Request, res: Response) {
     return res.status(500).json({ message: "Erreur serveur" });
   }
 }
+
 export async function login(req: Request, res: Response) {
   try {
     // 1. Validation avec zod
