@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User, LogOut, Search, Heart, PlusCircle, Smartphone, BookOpen, Shirt, Sofa, Bike, Utensils, Dumbbell, Laptop, Music, Ellipsis, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import MessagesNavLink from "@/components/messages-nav-link";
@@ -37,8 +37,17 @@ const categories = [
 export default function MainNav() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 24);
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isAdmin = user?.role === "ADMIN";
   const showVerifyBanner =
@@ -63,11 +72,11 @@ export default function MainNav() {
 
   return (
     <>
-    <div className="sticky top-0 z-50">
+    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
       <Navbar>
         <NavBody>
-          <Link href="/" className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal">
-            <span className="font-semibold text-primary text-2xl">Campus Marketplace</span>
+          <Link href="/" className="relative z-20 mr-6 flex shrink-0 items-center px-1 py-1 text-sm font-normal">
+            <span className="font-semibold tracking-tight text-foreground text-xl">Campus Marketplace</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 relative z-10">
@@ -75,7 +84,7 @@ export default function MainNav() {
               <Link
                 key={item.name}
                 href={item.link}
-                className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#4AA3A2]/15 transition-colors"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.name}
               </Link>
@@ -83,7 +92,7 @@ export default function MainNav() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#4AA3A2]/15 transition-colors inline-flex items-center gap-1.5"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
               >
                 <ShieldCheck className="h-4 w-4" />
                 Admin
@@ -91,7 +100,7 @@ export default function MainNav() {
             )}
             <Link
               href="/wishlist"
-              className="px-4 py-2 text-sm font-medium text-neutral-600 rounded-full hover:bg-[#4AA3A2]/15 transition-colors inline-flex items-center gap-1.5"
+              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
             >
               <Heart className="h-4 w-4" />
               Favoris
@@ -100,14 +109,14 @@ export default function MainNav() {
             {user && <NotificationsNavLink className="px-4 py-2" />}
           </nav>
 
-          <form onSubmit={handleSearch} className="relative hidden lg:block z-10">
+          <form onSubmit={handleSearch} className="relative hidden lg:block z-10 ml-auto mr-3">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Rechercher..."
-              className="w-48 rounded-full border border-border bg-card py-1.5 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-44 rounded-full border border-border bg-transparent py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </form>
 
@@ -135,7 +144,7 @@ export default function MainNav() {
 
         <MobileNav>
           <MobileNavHeader>
-            <Link href="/" className="text-sm font-semibold text-primary">
+            <Link href="/" className="text-base font-semibold tracking-tight text-foreground">
               Campus Marketplace
             </Link>
             <MobileNavToggle isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
@@ -214,7 +223,7 @@ export default function MainNav() {
           </MobileNavMenu>
         </MobileNav>
       </Navbar>
-    </div>
+    </header>
 
     {showVerifyBanner && (
       <div

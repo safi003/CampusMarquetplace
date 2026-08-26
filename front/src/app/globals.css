@@ -87,6 +87,52 @@ body {
   font-weight: 200;
 }
 
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  width: 100%;
+  height: 72px;
+  align-items: center;
+  transition: width 300ms ease, height 300ms ease, transform 300ms ease,
+    border-radius 300ms ease, background-color 300ms ease, box-shadow 300ms ease;
+}
+
+.site-header > div {
+  width: 100%;
+  transition: border-radius 300ms ease, background-color 300ms ease;
+}
+
+.site-header.is-scrolled {
+  width: calc(100% - 24px);
+  height: 58px;
+  margin-inline: auto;
+  transform: translateY(12px);
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--background) 78%, transparent);
+  box-shadow: 0 12px 30px rgb(15 23 42 / 12%);
+  backdrop-filter: blur(14px);
+}
+
+.site-header.is-scrolled > div,
+.site-header.is-scrolled > div > div:first-child {
+  border-radius: 9999px;
+  background: transparent;
+}
+
+@media (max-width: 1023px) {
+  .site-header {
+    height: auto;
+    min-height: 72px;
+  }
+
+  .site-header.is-scrolled {
+    min-height: 58px;
+  }
+}
+
 /* Stepper */
 .step-indicator-row {
   display: flex;

@@ -58,7 +58,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   const [visible, setVisible] = useState<boolean>(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
+    if (latest > 24) {
       setVisible(true);
     } else {
       setVisible(false);
@@ -88,19 +88,16 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
     <motion.div
       animate={{
         boxShadow: visible
-          ? "0 4px 12px rgba(0, 0, 0, 0.06)"
-          : "0 1px 2px rgba(0, 0, 0, 0.04)",
+          ? "0 8px 24px rgba(15, 23, 42, 0.08)"
+          : "0 1px 0 rgba(15, 23, 42, 0.08)",
       }}
       transition={{
         type: "spring",
         stiffness: 200,
         damping: 30,
       }}
-      style={{
-        minWidth: "800px",
-      }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full border border-[#4AA3A2]/20 bg-background/80 px-4 py-2 lg:flex dark:bg-neutral-950/80 backdrop-blur-md",
+        "relative z-60 mx-auto hidden w-full max-w-none flex-row items-center justify-between self-start border-b border-border bg-background/95 px-6 py-3 lg:flex dark:bg-neutral-950/95 backdrop-blur-md",
         visible && "bg-background shadow-lg dark:bg-neutral-950",
         className,
       )}
@@ -194,7 +191,7 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-white px-4 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] dark:bg-neutral-950",
+            "absolute inset-x-0 top-14 z-50 flex w-full flex-col items-start justify-start gap-4 border-y border-border bg-background px-6 py-6 shadow-xl dark:bg-neutral-950",
             className,
           )}
         >
@@ -254,12 +251,12 @@ export const NavbarButton = ({
   | React.ComponentPropsWithoutRef<"button">
 )) => {
   const baseStyles =
-    "px-4 py-2 rounded-md bg-white button bg-white text-black text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
+    "px-4 py-2 rounded-full text-sm font-semibold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
   const variantStyles = {
     primary:
-      "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
-    secondary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-none dark:text-white",
+      "bg-[#172121] text-white shadow-lg shadow-[#172121]/15 hover:bg-[#273535]",
+    secondary: "border border-border bg-transparent text-foreground hover:border-primary hover:text-primary shadow-none",
     dark: "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     gradient:
       "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
