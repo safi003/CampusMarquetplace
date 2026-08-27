@@ -8,7 +8,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { getSocket } from "@/lib/socket";
 import { apiFetch } from "@/app/lib/api";
 
-export default function NotificationsNavLink({ className = "" }: { className?: string }) {
+export default function NotificationsNavLink({
+  className = "",
+}: {
+  className?: string;
+}) {
   const { user, token } = useAuth();
   const pathname = usePathname();
   const [unread, setUnread] = useState(0);
@@ -52,7 +56,7 @@ export default function NotificationsNavLink({ className = "" }: { className?: s
     <Link
       href="/notifications"
       aria-label="Notifications"
-      className={`inline-flex items-center gap-1.5 rounded-full text-sm font-medium text-neutral-600 transition-colors hover:bg-[#4AA3A2]/15 ${className}`}
+      className={`inline-flex flex-col items-center gap-0.5 rounded-lg text-sm font-medium text-neutral-600 transition-colors hover:bg-[#4AA3A2]/15 ${className}`}
     >
       <span className="relative">
         <Bell className="h-4 w-4" />
@@ -62,7 +66,7 @@ export default function NotificationsNavLink({ className = "" }: { className?: s
           </span>
         )}
       </span>
-      Notifications
+      <span>Notifications</span>
     </Link>
   );
 }

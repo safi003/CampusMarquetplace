@@ -82,13 +82,11 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   );
 };
 
-export const NavBody = ({ children, className, visible }: NavBodyProps) => {
+export const NavBody = ({ children, className }: NavBodyProps) => {
   return (
     <motion.div
       animate={{
-        boxShadow: visible
-          ? "0 8px 24px rgba(15, 23, 42, 0.08)"
-          : "0 1px 0 rgba(15, 23, 42, 0.08)",
+        boxShadow: "none",
       }}
       transition={{
         type: "spring",
@@ -96,8 +94,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         damping: 30,
       }}
       className={cn(
-        "relative z-60 mx-auto hidden w-full max-w-none flex-row items-center justify-between self-start border-b border-border bg-background/95 px-6 py-3 lg:flex dark:bg-neutral-950/95 backdrop-blur-md",
-        visible && "bg-background shadow-lg dark:bg-neutral-950",
+        "relative z-60 mx-auto hidden w-full max-w-none flex-row items-center justify-between self-start px-6 py-3 lg:flex",
         className,
       )}
     >
@@ -138,11 +135,11 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   );
 };
 
-export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
+export const MobileNav = ({ children, className }: MobileNavProps) => {
   return (
     <motion.div
       animate={{
-        boxShadow: visible ? "0 4px 12px rgba(0, 0, 0, 0.06)" : "none",
+        boxShadow: "none",
       }}
       transition={{
         type: "spring",
@@ -151,8 +148,6 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
-        visible &&
-          "rounded-2xl bg-background/95 shadow-sm backdrop-blur-md dark:bg-neutral-950/95",
         className,
       )}
     >
@@ -191,7 +186,7 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={cn(
-            "absolute inset-x-0 top-14 z-50 flex w-full flex-col items-start justify-start gap-4 border-y border-border bg-background px-6 py-6 shadow-xl dark:bg-neutral-950",
+            "absolute inset-x-0 top-full z-50 flex w-full flex-col items-start justify-start gap-4 border-y border-border bg-background px-6 py-6 shadow-xl dark:bg-neutral-950",
             className,
           )}
         >

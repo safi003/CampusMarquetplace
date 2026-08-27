@@ -41,10 +41,18 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border text-center text-sm text-muted-foreground">
+        <div className="mt-10 pt-6 border-t border-border text-center text-sm text-muted-foreground"></div>
+      </div>
+
+      <div className=" w-full flex items-center justify-center   ">
+          <h1 className="text-center text-3xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text  text-[#4AA3A2] bg-gradient-to-b from-neutral-700 to-neutral-900 select-none">
+            Market Place
+          </h1>
+      </div>
+
+      <div className="pt-6 border-t border-border text-center text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} Campus Marketplace. Tous droits réservés.
         </div>
-      </div>
     </footer>
   )
 }

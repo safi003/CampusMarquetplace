@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   User,
@@ -51,9 +51,11 @@ const categories = [
 
 export default function MainNav() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -63,6 +65,10 @@ export default function MainNav() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (pathname === "/login" || pathname === "/register") {
+    return null;
+  }
 
   const isAdmin = user?.role === "ADMIN";
   const showVerifyBanner =
@@ -92,15 +98,38 @@ export default function MainNav() {
           <NavBody>
             <Link
               href="/"
-              className="relative z-20 mr-6 flex shrink-0 items-center px-1 py-1 text-sm font-normal"
+              className="relative z-20 flex shrink-0 items-center px-1 py-1 text-sm font-normal"
             >
-              <span className="font-semibold tracking-tight text-foreground text-xl">
+              <span className="font-bold tracking-tight text-3xl text-[#4AA3A2]">
                 Campus Marketplace
               </span>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-1 relative z-10">
-              {navItems.map((item) => (
+            <div className="relative z-10 ml-auto flex shrink-0 items-center gap-3">
+              <form
+                onSubmit={handleSearch}
+                className="relative hidden min-w-0 lg:block "
+              >
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher..."
+                  className="w-52 border-[#4AA3A2] rounded-full border border-border bg-transparent py-2 pl-9 pr-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 xl:w-64"
+                />
+              </form>
+              <NavbarButton
+                href={publishHref}
+                variant="primary"
+                className="bg-[#4AA3A2]"
+              >
+                <PlusCircle className="mr-1 inline h-4 w-4" />
+                Déposer une annonce
+              </NavbarButton>
+
+              <nav className="hidden items-center gap-1 border-l border-border pl-3 lg:flex">
+                {/* {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.link}
@@ -108,62 +137,80 @@ export default function MainNav() {
                 >
                   {item.name}
                 </Link>
-              ))}
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
-                >
-                  <ShieldCheck className="h-4 w-4" />
-                  Admin
-                </Link>
-              )}
-              <Link
-                href="/wishlist"
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
-              >
-                <Heart className="h-4 w-4" />
-                Favoris
-              </Link>
-              {user && <MessagesNavLink className="px-4 py-2" />}
-              {user && <NotificationsNavLink className="px-4 py-2" />}
-            </nav>
-
-            <form
-              onSubmit={handleSearch}
-              className="relative hidden lg:block z-10 ml-auto mr-3"
-            >
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Rechercher..."
-                className="w-44 rounded-full border border-border bg-transparent py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-              />
-            </form>
-
-            <div className="flex items-center gap-2 relative z-10">
-              <NavbarButton href={publishHref} variant="primary">
-                <PlusCircle className="h-4 w-4 mr-1 inline" />
-                Déposer une annonce
-              </NavbarButton>
-              {user ? (
-                <>
-                  <span className="text-sm text-gray-600">{user.name}</span>
-                  <NavbarButton
-                    as="button"
-                    onClick={logout}
-                    variant="secondary"
+              ))} */}
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-xs font-medium leading-tight text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    <LogOut className="h-4 w-4 mr-1 inline" />
-                    Déconnexion
-                  </NavbarButton>
-                </>
+                    <ShieldCheck className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
+                <Link
+                  href="/wishlist"
+                  className="inline-flex h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-xs font-medium leading-tight text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <Heart className="h-4 w-4" /> Favoris
+                </Link>
+                {user && (
+                  <MessagesNavLink className="h-12 min-w-[3.75rem] flex-col justify-center gap-0.5 rounded-lg px-2 text-xs leading-tight hover:bg-muted" />
+                )}
+                {user && (
+                  <NotificationsNavLink className="h-12 min-w-[3.75rem] flex-col justify-center gap-0.5 rounded-lg px-2 text-xs leading-tight hover:bg-muted" />
+                )}
+              </nav>
+
+              {user ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileMenuOpen((open) => !open)}
+                    aria-expanded={isProfileMenuOpen}
+                    aria-haspopup="menu"
+                    aria-label="Ouvrir le menu utilisateur"
+                    title="Menu utilisateur"
+                    className="inline-flex h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-xs leading-tight text-gray-600 transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="max-w-28 truncate">{user.name}</span>
+                  </button>
+                  {isProfileMenuOpen && (
+                    <div
+                      role="menu"
+                      className="absolute right-0 top-full z-50 mt-2 w-44 rounded-lg border border-border bg-background p-1 shadow-lg"
+                    >
+                      <Link
+                        href={`/sellers/${user.id}`}
+                        role="menuitem"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted"
+                      >
+                        Voir le profil
+                      </Link>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          logout();
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Déconnexion
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
-                <NavbarButton href="/login" variant="secondary">
-                  <User className="h-4 w-4 mr-1 inline" />
-                  Connexion
+                <NavbarButton
+                  href="/login"
+                  variant="secondary"
+                  className="bg-white text-[#4AA3A2] border-[#4AA3A2] hover:bg-[#4AA3A2] hover:text-white"
+                >
+                  <User className="mr-1 inline h-4 w-4" />
+                  Se connecter
                 </NavbarButton>
               )}
             </div>
@@ -175,14 +222,14 @@ export default function MainNav() {
                 href="/"
                 className="text-base font-semibold tracking-tight text-foreground"
               >
-                Campus Marketplace
+                <span className="text-[#4AA3A2] site-mobile-wordmark">Campus Marketplace</span>
               </Link>
               <MobileNavToggle
                 isOpen={isOpen}
                 onClick={() => setIsOpen(!isOpen)}
               />
             </MobileNavHeader>
-            <div className="w-full px-4 pt-3 pb-2 lg:hidden">
+            <div className="site-mobile-search w-full px-4 pt-3 pb-2">
               <form onSubmit={handleSearch} className="relative w-full">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
@@ -243,28 +290,59 @@ export default function MainNav() {
                   Déposer une annonce
                 </NavbarButton>
                 {user ? (
-                  <>
-                    <span className="text-sm text-gray-600 text-center">
-                      {user.name}
-                    </span>
-                    <NavbarButton
-                      as="button"
-                      onClick={logout}
-                      variant="secondary"
-                      className="w-full"
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsProfileMenuOpen((open) => !open)}
+                      aria-expanded={isProfileMenuOpen}
+                      aria-haspopup="menu"
+                      aria-label="Ouvrir le menu utilisateur"
+                      title="Menu utilisateur"
+                      className="flex w-full items-center justify-center rounded-lg px-2 py-2 text-gray-600 transition-colors hover:bg-muted hover:text-foreground"
                     >
-                      <LogOut className="h-4 w-4 mr-1 inline" />
-                      Déconnexion
-                    </NavbarButton>
-                  </>
+                      <User className="h-5 w-5" />
+                      <span className="max-w-full truncate">{user.name}</span>
+                    </button>
+                    {isProfileMenuOpen && (
+                      <div
+                        role="menu"
+                        className="absolute bottom-full left-0 z-50 mb-2 w-full rounded-lg border border-border bg-background p-1 shadow-lg"
+                      >
+                        <Link
+                          href={`/sellers/${user.id}`}
+                          role="menuitem"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setIsOpen(false);
+                          }}
+                          className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted"
+                        >
+                          Voir le profil
+                        </Link>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setIsOpen(false);
+                            logout();
+                          }}
+                          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Déconnexion
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <NavbarButton
                     href="/login"
                     variant="secondary"
-                    className="w-full"
+                    className="h-12 w-full flex-col gap-0.5 px-2 text-xs leading-tight"
                   >
-                    <User className="h-4 w-4 mr-1 inline" />
-                    Connexion
+                    <User className="h-5 w-5" />
+                    Se connecter
                   </NavbarButton>
                 )}
               </div>
@@ -293,7 +371,7 @@ export default function MainNav() {
         </div>
       )}
 
-      <div className="flex items-center justify-start gap-1 px-4 py-2 overflow-x-auto max-w-[100vw] flex-nowrap border-b border-border bg-card/50">
+      <div className="flex items-center font-bold justify-start gap-1 px-4 py-2 overflow-x-auto max-w-[100vw] flex-nowrap border-b border-border bg-card/50">
         {categories.map((cat) => {
           const Icon = cat.icon;
           return (

@@ -9,7 +9,11 @@ import { getSocket } from "@/lib/socket";
 import { apiFetch } from "@/app/lib/api";
 import { Conversation } from "@/types/chat";
 
-export default function MessagesNavLink({ className = "" }: { className?: string }) {
+export default function MessagesNavLink({
+  className = "",
+}: {
+  className?: string;
+}) {
   const { user, token } = useAuth();
   const pathname = usePathname();
   const [unread, setUnread] = useState(0);
@@ -53,7 +57,7 @@ export default function MessagesNavLink({ className = "" }: { className?: string
     <Link
       href="/chat"
       aria-label="Messages"
-      className={`inline-flex items-center gap-1.5 rounded-full text-sm font-medium text-neutral-600 transition-colors hover:bg-[#4AA3A2]/15 ${className}`}
+      className={`inline-flex flex-col items-center gap-0.5 rounded-lg text-sm font-medium text-neutral-600 transition-colors hover:bg-[#4AA3A2]/15 ${className}`}
     >
       <span className="relative">
         <MessageCircle className="h-4 w-4" />
@@ -63,7 +67,7 @@ export default function MessagesNavLink({ className = "" }: { className?: string
           </span>
         )}
       </span>
-      Messages
+      <span>Messages</span>
     </Link>
   );
 }

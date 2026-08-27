@@ -36,7 +36,7 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
@@ -53,7 +53,10 @@ export default function RegisterPage() {
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="name" className="text-sm font-medium text-foreground">
+            <Label
+              htmlFor="name"
+              className="text-sm font-medium text-foreground"
+            >
               Nom complet
             </Label>
             <Input
@@ -66,7 +69,10 @@ export default function RegisterPage() {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email" className="text-sm font-medium text-foreground">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-foreground"
+            >
               Email
             </Label>
             <Input
@@ -80,7 +86,10 @@ export default function RegisterPage() {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password" className="text-sm font-medium text-foreground">
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-foreground"
+            >
               Mot de passe
             </Label>
             <Input
@@ -95,7 +104,11 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <Button type="submit" className="h-10 w-full text-sm font-semibold" disabled={loading}>
+        <Button
+          type="submit"
+          className="h-10 w-full text-sm font-semibold"
+          disabled={loading}
+        >
           {loading ? "Inscription..." : "S'inscrire"}
         </Button>
 
