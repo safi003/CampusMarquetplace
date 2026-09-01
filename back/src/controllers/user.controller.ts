@@ -10,7 +10,7 @@ export async function getSeller(req: Request, res: Response) {
         id: true,
         name: true,
         createdAt: true,
-        _count: { select: { products: { where: { isSold: false } } } },
+        _count: { select: { products: { where: { status: "AVAILABLE" } } } },
       },
     });
 

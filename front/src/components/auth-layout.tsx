@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -57,8 +58,15 @@ export default function AuthLayout({
   const pathname = usePathname();
   const isLogin = pathname === "/login";
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-40 flex h-dvh flex-col overflow-hidden bg-background lg:flex-row">
+    <div className="fixed inset-0 z-40 flex h-dvh flex-col bg-background lg:flex-row lg:overflow-hidden">
       <Link
         href="/"
         className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-lg lg:bg-white lg:text-[#4AA3A2] px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:left-6 lg:top-6"

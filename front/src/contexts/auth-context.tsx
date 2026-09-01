@@ -74,20 +74,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [token, refreshUser]);
 
-  function login(user: User, token: string) {
+  const login = useCallback((user: User, token: string) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
     setUser(user);
     setToken(token);
-  }
+  }, []);
 
-  function logout() {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
     setToken(null);
     resetSocket();
-  }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, refreshUser }}>

@@ -32,8 +32,8 @@ export async function createOrder(req: Request, res: Response) {
     const order = await prisma.$transaction(async (tx) => {
       const [updated, created] = await Promise.all([
         tx.product.updateMany({
-          where: { id: productId, isSold: false },
-          data: { isSold: true },
+          where: { id: productId, status: "AVAILABLE" },
+          data: { status: "SOLD" },
         }),
         tx.order.create({
           data: {
@@ -104,7 +104,7 @@ export async function updateOrderStatus(req: Request, res: Response) {
       if (status === "CANCELLED" && order.status === "PENDING") {
         await tx.product.update({
           where: { id: order.productId },
-          data: { isSold: false },
+          data: { status: "AVAILABLE" },
         });
       }
 

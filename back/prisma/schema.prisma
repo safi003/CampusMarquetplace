@@ -22,11 +22,38 @@ enum CardStatus {
   APPROVED
   REJECTED
 }
-
+enum DeliveryMode {
+  DIRECT
+  HAND_DELIVERY
+}
+//ajout
 enum OrderStatus {
-  PENDING
-  COMPLETED
+  PENDING     // en file d'attente derrière une réservation active
+  ACTIVE      // réservation en cours pour ce client, chrono lancé
+  EXPIRED     // 15 min dépassées sans confirmation ni paiement verrouillé
+  COMPLETED   // double confirmation faite → vente actée
   CANCELLED
+}
+
+enum PaymentType {
+  SECURED
+  DIRECT
+}
+
+enum PaymentStatus {
+  NONE
+  HELD
+  RELEASED
+  REFUNDED
+}
+
+
+//fin
+
+enum ProductStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
 }
 
 model User {
@@ -35,7 +62,10 @@ model User {
   role               UserRole @default(STUDENT)
   email              String   @unique
   password           String?
+
   googleId           String?  @unique
+  githubId           String? @unique
+  
   imageCarteScolaire String?
   cardStatus         CardStatus @default(PENDING)
   cardRejectionReason String?
@@ -66,9 +96,8 @@ model Product {
   name        String
   description String
   price       Decimal
-  image       String?
   address     String?
-  isSold      Boolean  @default(false)
+  status      ProductStatus @default(AVAILABLE)   // remplace isSold
   handDelivery Boolean @default(false)
   createdAt   DateTime @default(now())
 
@@ -132,10 +161,21 @@ model Review {
 
 model Order {
   id        Int         @id @default(autoincrement())
-  mode      String      @default("direct") // "direct" | "hand_delivery"
+  mode      DeliveryMode @default(DIRECT) // "direct" | "hand_delivery"
   status    OrderStatus @default(PENDING)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+
+  activatedAt DateTime?   // quand cette réservation devient ACTIVE
+  expiresAt   DateTime?   // activatedAt + 15min
+
+  paymentType          PaymentType   @default(DIRECT)
+  paymentStatus        PaymentStatus @default(NONE)
+  paymentLockedByStaff Boolean       @default(false)
+
+  buyerConfirmed  Boolean @default(false)
+  sellerConfirmed Boolean @default(false)
 
   buyer     User    @relation("BuyerOrders", fields: [buyerId], references: [id])
   buyerId   Int

@@ -67,7 +67,7 @@ export async function getProducts(req: Request, res: Response) {
 
     const products = await prisma.product.findMany({
       where: {
-        isSold: false,
+        status: "AVAILABLE",
         ...(search && {
           name: { contains: String(search), mode: "insensitive" },
         }),

@@ -6,6 +6,7 @@ import { loginRequest } from "@/app/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import AuthLayout from "@/components/auth-layout";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { GithubSignInButton } from "@/components/github-sign-in-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,7 +61,10 @@ export default function LoginPage() {
           </Alert>
         )}
 
-        <GoogleSignInButton onError={setError} />
+        <div className="flex flex-row justify-around ">
+         <GoogleSignInButton onError={setError} />
+         <GithubSignInButton onError={setError} />
+        </div>
 
         <div className="relative flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />

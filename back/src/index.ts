@@ -1,3 +1,4 @@
+import session from "express-session";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -19,6 +20,7 @@ import { setupSocket } from "./socket";
 import messageRoutes from "./routes/message.routes";
 
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -29,7 +31,19 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000,http:
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
-
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 10 * 60 * 1000, // 10 minutes
+    },
+  })
+);
 // Sert les fichiers depuis RustFS (avec fallback disque pour les anciens fichiers)
 app.get("/uploads/:dir/:file", async (req, res) => {
   const key = `uploads/${req.params.dir}/${req.params.file}`;
