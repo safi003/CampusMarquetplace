@@ -16,11 +16,12 @@ const router = Router();
 
 router.post("/", authenticate, createOrder);
 router.get("/", authenticate, getMyOrders);
+router.get("/product/:productId/queue", authenticate, getProductQueue);
+router.get("/:id", authenticate, getOrderById);
 router.patch("/:id", authenticate, updateOrderStatus);
-router.get("/orders/:id", authenticate, getOrderById);
-router.get("/orders/product/:productId/queue", authenticate, getProductQueue);
-router.patch("/orders/:id/activate", authenticate, activateOrder);
-router.patch("/orders/:id/confirm", authenticate, confirmOrder);
-router.patch("/orders/:id/release-payment",authenticate, requireAdmin, releasePayment);
-router.patch("/orders/:id/lock-secured", authenticate, requireAdmin, lockSecuredOrder);
+router.patch("/:id/activate", authenticate, activateOrder);
+router.patch("/:id/confirm", authenticate, confirmOrder);
+router.patch("/:id/release-payment", authenticate, requireAdmin, releasePayment);
+router.patch("/:id/lock-secured", authenticate, requireAdmin, lockSecuredOrder);
+
 export default router;
