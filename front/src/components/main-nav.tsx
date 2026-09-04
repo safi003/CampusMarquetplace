@@ -54,7 +54,9 @@ export default function MainNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
+
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 
@@ -80,14 +82,12 @@ export default function MainNav() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   }
 
   // Non connecté -> connexion ; sans pièce d'identité valide -> carte scolaire ; sinon publication
-  const publishHref = !user
-    ? "/login"
-    : !user.imageCarteScolaire || user.cardStatus === "REJECTED"
+  const publishHref = !user ? "/login" : !user.imageCarteScolaire || user.cardStatus === "REJECTED" || user.cardStatus === "PENDING"
       ? "/carte-scolaire"
       : "/products";
 
@@ -106,10 +106,8 @@ export default function MainNav() {
             </Link>
 
             <div className="relative z-10 ml-auto flex shrink-0 items-center gap-3">
-              <form
-                onSubmit={handleSearch}
-                className="relative hidden min-w-0 lg:block "
-              >
+
+              <form onSubmit={handleSearch} className="relative hidden min-w-0 lg:block ">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"

@@ -237,7 +237,7 @@ async function main() {
         cardStatus: "APPROVED",
       },
     });
-    console.log("Admin : admin@univ.fr / admin1234 OK");
+    console.log(`Admin : ${adminEmail} / ${PASSWORD} OK`);
   }
 
   for (let i = 0; i < SEED_USERS.length; i++) {

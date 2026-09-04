@@ -62,11 +62,8 @@ export default function CarteScolairePage() {
       }
 
       await refreshUser();
-
-      // Redirige vers le formulaire de publication après l'envoi
       setSuccess(true);
       setFile(null);
-      setTimeout(() => router.push("/products"), 1200);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
@@ -94,7 +91,7 @@ export default function CarteScolairePage() {
             {user.cardStatus === "PENDING" && (
               <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#4AA3A2]">
                 <AlertDescription>
-                  Votre pièce d&apos;identité sera verifier par un administrateur.
+                  Votre pièce d&apos;identité est en attente de vérification. Un administrateur va la vérifier. Vous pourrez publier des annonces une fois votre compte validé.
                 </AlertDescription>
               </Alert>
             )}
@@ -114,7 +111,7 @@ export default function CarteScolairePage() {
               </Alert>
             )}
 
-            {user.imageCarteScolaire && (
+            {user.imageCarteScolaire && user.cardStatus !== "PENDING" && (
               <Alert variant="default" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
                 <AlertDescription>
                   Pièce d&apos;identité déjà ajoutée. Vous pouvez en envoyer une nouvelle pour la remplacer.
@@ -131,38 +128,53 @@ export default function CarteScolairePage() {
             {success && (
               <Alert className="border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
                 <AlertDescription>
-                  Pièce d&apos;identité envoyée. Vous pouvez maintenant publier vos annonces.
+                  Pièce d&apos;identité envoyée. Votre compte est en attente de vérification par un administrateur.
                 </AlertDescription>
               </Alert>
             )}
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="carte">Photo de la pièce d&apos;identité</Label>
-              <Input
-                id="carte"
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="h-10 file:mr-2 file:h-6 file:rounded-md file:border-0 file:bg-primary file:px-3 file:text-xs file:font-medium file:text-primary-foreground file:hover:bg-primary/90"
-              />
-              <p className="text-xs text-muted-foreground">
-                Formats acceptés : JPG, PNG, WEBP. La photo doit montrer clairement votre nom.
-              </p>
-            </div>
+            {user.cardStatus !== "PENDING" && user.cardStatus !== "APPROVED" && (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="carte">Photo de la pièce d&apos;identité</Label>
+                <Input
+                  id="carte"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  className="h-10 file:mr-2 file:h-6 file:rounded-md file:border-0 file:bg-primary file:px-3 file:text-xs file:font-medium file:text-primary-foreground file:hover:bg-primary/90"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Formats acceptés : JPG, PNG, WEBP. La photo doit montrer clairement votre nom.
+                </p>
+              </div>
+            )}
           </CardContent>
-          <CardFooter className="flex flex-col gap-3">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Envoi..." : "Envoyer ma pièce d'identité"}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-muted-foreground"
-              onClick={() => router.push("/products")}
-            >
-              Retour à la publication
-            </Button>
-          </CardFooter>
+          {(user.cardStatus === "PENDING" || user.cardStatus === "APPROVED") ? (
+            <CardFooter className="flex flex-col gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => router.push("/")}
+              >
+                Retour à l&apos;accueil
+              </Button>
+            </CardFooter>
+          ) : (
+            <CardFooter className="flex flex-col gap-3">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Envoi..." : "Envoyer ma pièce d'identité"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-muted-foreground"
+                onClick={() => router.push("/")}
+              >
+                Retour à l&apos;accueil
+              </Button>
+            </CardFooter>
+          )}
         </form>
       </Card>
     </div>

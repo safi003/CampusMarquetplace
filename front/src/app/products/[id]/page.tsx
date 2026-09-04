@@ -138,20 +138,24 @@ export default async function ProductDetailPage({
               </div>
               <div>
                 <p className="text-sm font-semibold">{product.seller.name}</p>
-<div className="px-1">
-              <RatingSummary
-                averageRating={reviewsData.averageRating}
-                totalReviews={reviewsData.totalReviews}
-              />
-            </div>
+                <div className="px-1">
+                  <RatingSummary
+                    averageRating={reviewsData.averageRating}
+                    totalReviews={reviewsData.totalReviews}
+                  />
+                </div>
               </div>
             </Link>
           </div>
 
           <div className="hidden md:flex flex-col gap-2.5">
-            {product.isSold ? (
+            {product.status === "SOLD" ? (
               <div className="rounded-lg bg-muted px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                 Vendu
+              </div>
+            ) : product.status === "RESERVED" ? (
+              <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-center text-sm font-medium text-amber-700">
+                Réservé — tentez votre chance
               </div>
             ) : (
               <BuyButton productId={product.id} />
@@ -173,14 +177,16 @@ export default async function ProductDetailPage({
       {/* Barre d'actions fixe en bas - mobile uniquement */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background p-3 md:hidden">
         <div className="flex gap-2.5">
-          {product.isSold ? (
-            <div className="flex-1 rounded-lg bg-muted px-4 py-3 text-center text-sm font-medium text-muted-foreground">
+          {product.status === "SOLD" ? (
+            <div className="rounded-lg bg-muted px-4 py-3 text-center text-sm font-medium text-muted-foreground">
               Vendu
             </div>
-          ) : (
-            <div className="flex-1">
-              <BuyButton productId={product.id} />
+          ) : product.status === "RESERVED" ? (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-center text-sm font-medium text-amber-700">
+              Réservé — tentez votre chance
             </div>
+          ) : (
+            <BuyButton productId={product.id} />
           )}
           <Link href={`/chat/${product.seller.id}`} className="flex-1">
             <Button size="lg" variant="outline" className="w-full text-primary">

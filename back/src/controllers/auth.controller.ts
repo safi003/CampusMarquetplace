@@ -19,7 +19,7 @@ export async function register(req: Request, res: Response) {
     if (!parsed.success) {
       return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
     }
-    const { name, email, password, role } = parsed.data;
+    const { name, email, password } = parsed.data;
 
     // 2. Vérifie que l'email n'existe pas déjà
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -43,7 +43,7 @@ export async function register(req: Request, res: Response) {
         name,
         email,
         password: hashedPassword,
-        role: role.toUpperCase() as "STUDENT" | "ADMIN", // aligné avec l'enum Prisma
+        role: "USER",
         ...(carteKey
           ? { imageCarteScolaire: carteKey, cardStatus: "PENDING" as const }
           : {}),
@@ -258,6 +258,7 @@ export async function googleCallback(req: Request, res: Response) {
           name: payload.name || email.split("@")[0],
           email,
           googleId: payload.sub,
+          role: "USER",
         },
       });
     }
@@ -457,6 +458,7 @@ export async function githubCallback(req: Request, res: Response) {
             email.split("@")[0],
           email,
           githubId: String(githubUser.id),
+          role: "USER",
         },
       });
     }

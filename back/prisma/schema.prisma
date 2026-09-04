@@ -13,7 +13,7 @@ datasource db {
 }
 
 enum UserRole {
-  STUDENT
+  USER
   ADMIN
 }
 
@@ -59,7 +59,7 @@ enum ProductStatus {
 model User {
   id                 Int      @id @default(autoincrement())
   name               String
-  role               UserRole @default(STUDENT)
+  role               UserRole @default(USER)
   email              String   @unique
   password           String?
 
@@ -170,7 +170,7 @@ model Order {
   activatedAt DateTime?   // quand cette réservation devient ACTIVE
   expiresAt   DateTime?   // activatedAt + 15min
 
-  paymentType          PaymentType   @default(DIRECT)
+  paymentType          PaymentType   @default(SECURED)
   paymentStatus        PaymentStatus @default(NONE)
   paymentLockedByStaff Boolean       @default(false)
 

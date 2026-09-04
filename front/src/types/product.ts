@@ -4,7 +4,7 @@ export interface Product {
   description: string;
   price: number;
   address: string;
-  isSold: boolean;
+  status: "AVAILABLE" | "RESERVED" | "SOLD"; 
   handDelivery: boolean;
   createdAt: string;
   images: { id: number; url: string }[]; // remplace image: string | null

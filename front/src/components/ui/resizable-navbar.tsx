@@ -7,6 +7,7 @@ import {
   useScroll,
   useMotionValueEvent,
 } from "motion/react";
+import Link from "next/link";
 
 import React, { useRef, useState } from "react";
 
@@ -258,12 +259,18 @@ export const NavbarButton = ({
       "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
   };
 
+  const classes = cn(baseStyles, variantStyles[variant], className);
+
+  if (href) {
+    return (
+      <Link href={href} className={classes} {...props}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
-    <Tag
-      href={href || undefined}
-      className={cn(baseStyles, variantStyles[variant], className)}
-      {...props}
-    >
+    <Tag className={classes} {...props}>
       {children}
     </Tag>
   );
