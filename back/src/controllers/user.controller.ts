@@ -9,6 +9,7 @@ export async function getSeller(req: Request, res: Response) {
       select: {
         id: true,
         name: true,
+        role: true,
         createdAt: true,
         _count: { select: { products: { where: { status: "AVAILABLE" } } } },
       },

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import type { Server } from "socket.io";
 import prisma from "../lib/prisma";
 import {
   createOrderSchema,
@@ -10,7 +11,9 @@ const orderInclude = {
   buyer: { select: { id: true, name: true } },
   seller: { select: { id: true, name: true } },
 };
-import { checkAndExpireActiveOrder } from "../services/order.service";
+import { checkAndExpireActiveOrder, notify } from "../services/order.service";
+import { notifyUser } from "../lib/notify";
+
 
 export async function createOrder(req: Request, res: Response) {
   try {
@@ -79,6 +82,37 @@ export async function createOrder(req: Request, res: Response) {
       });
     });
 
+    if (order!.status === "ACTIVE") {
+      await notify(
+        product.sellerId,
+        "NEW_ORDER",
+        `${order!.buyer.name} souhaite acheter "${product.name}"`,
+        `/orders/${order!.id}`
+      );
+    } else {
+      await notify(
+        product.sellerId,
+        "NEW_ORDER_WAITING",
+        `${order!.buyer.name} veut aussi acheter "${product.name}" (en file d'attente)`,
+        `/orders/product/${product.id}/queue`
+      );
+    }
+
+    if (order!.paymentType === "SECURED") {
+      const admins = await prisma.user.findMany({
+        where: { role: "ADMIN" },
+        select: { id: true },
+      });
+      const io = req.app.get("io");
+      for (const admin of admins) {
+        await notifyUser(io, {
+          userId: admin.id,
+          type: "PAYMENT_VERIFICATION",
+          content: `Paiement sécurisé à vérifier : "${product.name}" (${order!.buyer.name})`,
+          link: "/admin",
+        });
+      }
+    }
     return res.status(201).json(order);
   } catch (error) {
     console.error(error);
@@ -187,7 +221,7 @@ export async function getProductQueue(req: Request, res: Response) {
     if (!product) {
       return res.status(404).json({ message: "Produit introuvable" });
     }
-    if (product.sellerId !== req.user!.id || req.user!.role === "ADMIN") {
+    if (product.sellerId !== req.user!.id && req.user!.role !== "ADMIN") {
       return res
         .status(403)
         .json({ message: "Vous n'êtes pas le vendeur de ce produit" });
@@ -310,7 +344,17 @@ export async function confirmOrder(req: Request, res: Response) {
       const confirmed = await tx.order.update({
         where: { id },
         data,
+        include: orderInclude,
       });
+      const recipientId = isBuyer ? confirmed.sellerId : confirmed.buyerId;
+      await notify(
+        recipientId,
+        "ORDER_CONFIRMATION",
+        isBuyer
+          ? `${confirmed.buyer.name} a confirmé la transaction, à votre tour`
+          : `${confirmed.seller.name} a confirmé la transaction, à votre tour`,
+        `/orders/${id}`
+      );
 
       if (confirmed.buyerConfirmed && confirmed.sellerConfirmed) {
         const completed = await tx.order.update({
@@ -389,7 +433,14 @@ export async function lockSecuredOrder(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
 
-    const order = await prisma.order.findUnique({ where: { id } });
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        product: { select: { name: true } },
+        buyer: { select: { name: true } },
+        seller: { select: { name: true } },
+      },
+    });
     if (!order) {
       return res.status(404).json({ message: "Commande introuvable" });
     }
@@ -404,6 +455,8 @@ export async function lockSecuredOrder(req: Request, res: Response) {
         .json({ message: "Seule une commande active peut être verrouillée" });
     }
 
+    const alreadyLocked = order.paymentLockedByStaff || order.paymentStatus === "HELD";
+
     const updated = await prisma.order.update({
       where: { id },
       data: {
@@ -412,9 +465,64 @@ export async function lockSecuredOrder(req: Request, res: Response) {
       },
     });
 
+    if (!alreadyLocked) {
+      const io = req.app.get("io") as Server | undefined;
+      await notifyUser(io, {
+        userId: order.buyerId,
+        type: "PAYMENT_LOCKED",
+        content: `Votre paiement pour "${order.product.name}" a bien été reçu. L'argent est sécurisé et sera bloqué jusqu'à la réception de votre commande.`,
+        link: `/orders/${id}`,
+      });
+      await notifyUser(io, {
+        userId: order.sellerId,
+        type: "PAYMENT_LOCKED",
+        content: `Le paiement sécurisé de "${order.product.name}" est confirmé. L'argent est bloqué et sera libéré à la livraison. Vous pouvez effectuer la livraison avec ${order.buyer.name}.`,
+        link: `/orders/${id}`,
+      });
+
+      await sendAdminMessage(
+        io,
+        req.user!.id,
+        order.buyerId,
+        `Bonjour ${order.buyer.name}, votre paiement pour "${order.product.name}" a bien été reçu par notre équipe. L'argent est sécurisé et sera reversé au vendeur uniquement après confirmation de la réception de votre commande.`
+      );
+      await sendAdminMessage(
+        io,
+        req.user!.id,
+        order.sellerId,
+        `Bonjour ${order.seller.name}, le paiement sécurisé pour "${order.product.name}" a été confirmé. L'argent est bloqué et sera libéré à la livraison. Vous pouvez procéder à la livraison pour ${order.buyer.name}.`
+      );
+    }
+
     return res.status(200).json(updated);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
+}
+
+async function sendAdminMessage(
+  io: Server | null | undefined,
+  senderId: number,
+  receiverId: number,
+  content: string
+) {
+  const created = await prisma.message.create({
+    data: { senderId, receiverId, content },
+  });
+  const message = await prisma.message.findUnique({
+    where: { id: created.id },
+    include: {
+      sender: { select: { id: true, name: true } },
+      receiver: { select: { id: true, name: true } },
+    },
+  });
+  io?.to(`user:${receiverId}`).emit("message:new", message);
+
+  await notifyUser(io, {
+    userId: receiverId,
+    type: "ADMIN_MESSAGE",
+    content: "Un administrateur vous a envoyé un message.",
+    link: "/chat",
+  });
 }

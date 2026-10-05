@@ -22,7 +22,17 @@ interface AdminUser {
   totalReviews: number;
   totalProducts: number;
 }
-
+interface AdminOrder {
+  id: number;
+  status: string;
+  paymentType: "SECURED" | "DIRECT";
+  paymentStatus: "NONE" | "HELD" | "RELEASED" | "REFUNDED";
+  createdAt: string;
+  expiresAt: string | null;
+  buyer: { id: number; name: string };
+  seller: { id: number; name: string };
+  product: { id: number; name: string; price: number; images: { id: number; url: string }[] };
+} 
 const statusLabels: Record<AdminUser["cardStatus"], string> = {
   APPROVED: "Validé",
   PENDING: "En attente",
@@ -132,12 +142,13 @@ function UserRow({ user: u, rank, busy, showActions = false, onDecide, onRequest
   );
 }
 
-type Tab = "approuver" | "attente";
+type Tab = "approuver" | "attente" | "paiements";
 
 export default function AdminPage() {
   const { user, token } = useAuth();
   const [tab, setTab] = useState<Tab>("approuver");
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionUser, setActionUser] = useState<AdminUser | null>(null);
@@ -159,14 +170,59 @@ export default function AdminPage() {
     }
   }, [token]);
 
+  const loadOrders = useCallback(async () => {
+  try {
+    const res = await apiFetch(`/admin/orders`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erreur lors du chargement");
+    setOrders(data);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Erreur lors du chargement");
+  }
+}, [token]);
+
   useEffect(() => {
     if (user?.role === "ADMIN" && token) {
       void (async () => {
         await loadUsers();
+        await loadOrders();
       })();
     }
-  }, [user, token, loadUsers]);
+  }, [user, token, loadUsers, loadOrders]);
+  
 
+
+  async function lockPayment(id: number) {
+  setBusy(true);
+  setError("");
+  try {
+    const res = await apiFetch(`/orders/${id}/lock-secured`, { method: "PATCH" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erreur serveur");
+    await loadOrders();
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Erreur serveur");
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function releasePayment(id: number) {
+  setBusy(true);
+  setError("");
+  try {
+    const res = await apiFetch(`/orders/${id}/release-payment`, { method: "PATCH" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erreur serveur");
+    await loadOrders();
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Erreur serveur");
+  } finally {
+    setBusy(false);
+  }
+}
   async function decide(id: number, decision: "approve" | "reject", reason?: string) {
     setBusy(true);
     setError("");
@@ -211,6 +267,12 @@ export default function AdminPage() {
 
   const pendingCount = users.filter((u) => u.cardStatus === "PENDING").length;
   const pendingUsers = users.filter((u) => u.cardStatus !== "APPROVED");
+  const pendingVerif = orders.filter(
+    (o) => o.paymentType === "SECURED" && o.paymentStatus === "NONE"
+  );
+  const heldToRelease = orders.filter(
+    (o) => o.paymentType === "SECURED" && o.paymentStatus === "HELD" && o.status === "COMPLETED"
+  );
 
   return (
     <>
@@ -236,6 +298,16 @@ export default function AdminPage() {
           >
             Cartes à vérifier ({pendingCount})
           </button>
+          <button
+  onClick={() => setTab("paiements")}
+  className={`px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
+    tab === "paiements"
+      ? "bg-card border border-border border-b-white text-foreground -mb-px"
+      : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+  }`}
+>
+  Paiements à vérifier ({pendingVerif.length})
+</button>
         </div>
 
         {error && (
@@ -285,6 +357,50 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+
+        {tab === "paiements" && (
+  <div className="flex flex-col gap-3">
+    {orders.length === 0 && (
+      <div className="py-10 text-center text-muted-foreground">Aucune commande.</div>
+    )}
+    {orders.map((o) => (
+      <div key={o.id} className="rounded-xl border border-border bg-card p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-semibold text-sm truncate">{o.product.name}</p>
+            <p className="text-sm font-bold text-[#4AA3A2]">{o.product.price} FCFA</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {o.buyer.name} → {o.seller.name} · n°{o.id}
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground flex-shrink-0">{o.status}</span>
+        </div>
+
+        {o.paymentType === "SECURED" && o.paymentStatus === "NONE" && (
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
+            <span className="text-xs text-amber-600">En attente de vérification</span>
+            <Button size="sm" onClick={() => lockPayment(o.id)} disabled={busy}>
+              Vérifier &amp; bloquer les fonds
+            </Button>
+          </div>
+        )}
+        {o.paymentType === "SECURED" && o.paymentStatus === "HELD" && o.status === "COMPLETED" && (
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
+            <span className="text-xs text-[#4AA3A2]">Fonds bloqués — vente confirmée</span>
+            <Button size="sm" onClick={() => releasePayment(o.id)} disabled={busy}>
+              Libérer les fonds
+            </Button>
+          </div>
+        )}
+        {o.paymentType !== "SECURED" && (
+          <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+            Paiement direct — hors vérification staff.
+          </p>
+        )}
+      </div>
+    ))}
+  </div>
+)}
       </div>
 
       {actionUser && (

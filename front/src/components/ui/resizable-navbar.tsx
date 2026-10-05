@@ -242,10 +242,11 @@ export const NavbarButton = ({
   children: React.ReactNode;
   className?: string;
   variant?: "primary" | "secondary" | "dark" | "gradient";
-} & (
-  | React.ComponentPropsWithoutRef<"a">
-  | React.ComponentPropsWithoutRef<"button">
-)) => {
+} & Omit<React.ComponentPropsWithoutRef<"a">, "href" | "children" | "className"> &
+  Omit<
+    React.ComponentPropsWithoutRef<"button">,
+    "children" | "className"
+  >) => {
   const baseStyles =
     "px-4 py-2 rounded-full text-sm font-semibold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
@@ -263,14 +264,18 @@ export const NavbarButton = ({
 
   if (href) {
     return (
-      <Link href={href} className={classes} {...props}>
+      <Link
+        href={href}
+        className={classes}
+        {...(props as React.ComponentPropsWithoutRef<"a">)}
+      >
         {children}
       </Link>
     );
   }
 
   return (
-    <Tag className={classes} {...props}>
+    <Tag className={classes} {...(props as Record<string, unknown>)}>
       {children}
     </Tag>
   );

@@ -38,6 +38,12 @@ export function setupSocket(io: Server) {
         if (!receiver) {
           return ack?.({ ok: false, message: "Destinataire introuvable" });
         }
+        if (receiver.role === "ADMIN") {
+          return ack?.({
+            ok: false,
+            message: "Ces messages sont informatifs, vous ne pouvez pas y répondre.",
+          });
+        }
 
         const created = await prisma.message.create({
           data: { senderId: userId, receiverId, content },

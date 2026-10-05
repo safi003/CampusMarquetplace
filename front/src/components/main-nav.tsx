@@ -20,6 +20,7 @@ import {
   Music,
   Ellipsis,
   ShieldCheck,
+  ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import MessagesNavLink from "@/components/messages-nav-link";
@@ -152,6 +153,14 @@ export default function MainNav() {
                   <Heart className="h-4 w-4" /> Favoris
                 </Link>
                 {user && (
+                  <Link
+                    href="/orders"
+                    className="inline-flex h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-xs font-medium leading-tight text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <ShoppingBag className="h-4 w-4" /> Commandes
+                  </Link>
+                )}
+                {user && (
                   <MessagesNavLink className="h-12 min-w-[3.75rem] flex-col justify-center gap-0.5 rounded-lg px-2 text-xs leading-tight hover:bg-muted" />
                 )}
                 {user && (
@@ -268,6 +277,16 @@ export default function MainNav() {
                 <Heart className="h-4 w-4" />
                 Favoris
               </a>
+              {user && (
+                <a
+                  href="/orders"
+                  onClick={() => setIsOpen(false)}
+                  className="text-neutral-600 dark:text-neutral-300 inline-flex items-center gap-1.5"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  Commandes
+                </a>
+              )}
               {user && (
                 <div onClick={() => setIsOpen(false)}>
                   <MessagesNavLink className="px-0" />

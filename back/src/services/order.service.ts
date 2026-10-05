@@ -50,3 +50,14 @@ export async function checkAndExpireActiveOrder(productId: number) {
     return null;
   });
 }
+
+export async function notify(
+  userId: number,
+  type: string,
+  content: string,
+  link?: string
+) {
+  return prisma.notification.create({
+    data: { userId, type, content, link },
+  });
+}

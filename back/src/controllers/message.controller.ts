@@ -94,6 +94,11 @@ export async function sendMessage(req: Request, res: Response) {
     if (!receiver) {
       return res.status(404).json({ message: "Destinataire introuvable" });
     }
+    if (receiver.role === "ADMIN") {
+      return res
+        .status(403)
+        .json({ message: "Ces messages sont informatifs, vous ne pouvez pas y répondre." });
+    }
 
     const created = await prisma.message.create({
       data: { senderId: req.user!.id, receiverId, content },

@@ -18,6 +18,7 @@ export default function ChatThreadPage() {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [otherName, setOtherName] = useState("");
+  const [otherRole, setOtherRole] = useState("");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -36,6 +37,7 @@ export default function ChatThreadPage() {
         ]);
         if (Array.isArray(messagesData)) setMessages(messagesData);
         if (sellerData?.name) setOtherName(sellerData.name);
+        if (sellerData?.role) setOtherRole(sellerData.role);
       })
       .finally(() => setLoading(false));
   }, [userId, token]);
@@ -129,17 +131,23 @@ export default function ChatThreadPage() {
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSend} className="flex gap-2 border-t border-border pt-3">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Écrivez un message..."
-          className="flex-1"
-        />
-        <Button type="submit" disabled={!input.trim()}>
-          Envoyer
-        </Button>
-      </form>
+      {otherRole === "ADMIN" ? (
+        <div className="border-t border-border pt-3 text-center text-sm text-muted-foreground">
+          Ce fil de discussion est informatif, vous ne pouvez pas y répondre.
+        </div>
+      ) : (
+        <form onSubmit={handleSend} className="flex gap-2 border-t border-border pt-3">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Écrivez un message..."
+            className="flex-1"
+          />
+          <Button type="submit" disabled={!input.trim()}>
+            Envoyer
+          </Button>
+        </form>
+      )}
     </div>
   );
 }

@@ -56,6 +56,23 @@ export async function getUsers(req: Request, res: Response) {
   }
 }
 
+export async function getOrders(req: Request, res: Response) {
+  try {
+    const orders = await prisma.order.findMany({
+      include: {
+        product: { select: { id: true, name: true, price: true, images: true } },
+        buyer: { select: { id: true, name: true, email: true, cardStatus: true } },
+        seller: { select: { id: true, name: true, email: true, cardStatus: true } },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+    return res.json(orders);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
 export async function approveCard(req: Request, res: Response) {
   try {
     const userId = Number(req.params.id);
