@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getSafeRedirect } from "@/lib/safe-redirect";
 
-export default function GithubCallbackPage() {
+function GithubCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
@@ -56,5 +56,19 @@ export default function GithubCallbackPage() {
     <div className="flex min-h-screen items-center justify-center">
       <p>Connexion avec GitHub...</p>
     </div>
+  );
+}
+
+export default function GithubCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <p>Connexion avec GitHub...</p>
+        </div>
+      }
+    >
+      <GithubCallbackContent />
+    </Suspense>
   );
 }
