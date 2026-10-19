@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { resetSocket, getSocket } from "@/lib/socket";
-import { apiFetch } from "@/app/lib/api";
 
 interface User {
   id: number;
@@ -42,7 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     if (!localStorage.getItem("token")) return;
     try {
-      const res = await apiFetch(`/auth/me`);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) return;
       const fresh = await res.json();
       localStorage.setItem("user", JSON.stringify(fresh));
