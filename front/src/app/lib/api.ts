@@ -9,6 +9,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
 
+  console.debug("[apiFetch]", res.status, `${API_URL}${path}`);
   if (res.status === 401) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
