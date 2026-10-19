@@ -11,6 +11,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 
   console.debug("[apiFetch]", res.status, `${API_URL}${path}`);
   if (res.status === 401) {
+    console.error("[apiFetch 401]", `${API_URL}${path}`);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     resetSocket();
