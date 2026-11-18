@@ -1,83 +1,17 @@
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
-import zlib from "zlib";
 import bcrypt from "bcrypt";
 import prisma from "../src/lib/prisma";
 import { uploadFile } from "../src/lib/storage";
 
 // ---------------------------------------------------------------------------
-// Outils : génération de PNG de couleur unie (aucune dépendance externe)
+// Photos disponibles dans front/public (monté dans le conteneur backend en production)
 // ---------------------------------------------------------------------------
 
-const CRC_TABLE = (() => {
-  const t = new Int32Array(256);
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    t[n] = c;
-  }
-  return t;
-})();
-
-function crc32(buf: Buffer): number {
-  let c = -1;
-  for (let i = 0; i < buf.length; i++) {
-    c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-  }
-  return (c ^ -1) >>> 0;
-}
-
-function chunk(type: string, data: Buffer): Buffer {
-  const len = Buffer.alloc(4);
-  len.writeUInt32BE(data.length);
-  const typeBuf = Buffer.from(type, "ascii");
-  const crcBuf = Buffer.alloc(4);
-  crcBuf.writeUInt32BE(crc32(Buffer.concat([typeBuf, data])));
-  return Buffer.concat([len, typeBuf, data, crcBuf]);
-}
-
-function makePng(width: number, height: number, [r, g, b]: [number, number, number]): Buffer {
-  const raw = Buffer.alloc((width * 3 + 1) * height);
-  for (let y = 0; y < height; y++) {
-    const rowStart = y * (width * 3 + 1);
-    raw[rowStart] = 0;
-    for (let x = 0; x < width; x++) {
-      const p = rowStart + 1 + x * 3;
-      raw[p] = r;
-      raw[p + 1] = g;
-      raw[p + 2] = b;
-    }
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(width, 0);
-  ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8;
-  ihdr[9] = 2;
-  ihdr[10] = 0;
-  ihdr[11] = 0;
-  ihdr[12] = 0;
-  const idat = zlib.deflateSync(raw);
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk("IHDR", ihdr),
-    chunk("IDAT", idat),
-    chunk("IEND", Buffer.alloc(0)),
-  ]);
-}
-
-const PALETTE: [number, number, number][] = [
-  [52, 152, 219], [46, 204, 113], [231, 76, 60], [241, 196, 15],
-  [155, 89, 182], [26, 188, 156], [230, 126, 34], [52, 73, 94],
-  [236, 112, 99], [90, 120, 127], [127, 179, 213], [247, 148, 89],
-];
-
-// ---------------------------------------------------------------------------
-// Images réelles de démonstration (back/uploads/products), avec repli sur des
-// couleurs unies si le dossier est vide ou illisible.
-// ---------------------------------------------------------------------------
-
-const SEED_IMAGE_DIR = path.join(__dirname, "..", "uploads", "products");
+const SEED_ASSET_DIR =
+  process.env.SEED_ASSET_DIR ||
+  path.resolve(__dirname, "..", "..", "front", "public");
 
 const MIME_BY_EXT: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -86,20 +20,19 @@ const MIME_BY_EXT: Record<string, string> = {
   ".webp": "image/webp",
 };
 
-const SEED_IMAGES: { buffer: Buffer; mimetype: string; ext: string }[] = (() => {
-  try {
-    return fs
-      .readdirSync(SEED_IMAGE_DIR)
-      .filter((f) => MIME_BY_EXT[path.extname(f).toLowerCase()])
-      .map((f) => ({
-        buffer: fs.readFileSync(path.join(SEED_IMAGE_DIR, f)),
-        mimetype: MIME_BY_EXT[path.extname(f).toLowerCase()],
-        ext: path.extname(f).toLowerCase(),
-      }));
-  } catch {
-    return [];
+function readSeedImage(fileName: string) {
+  const ext = path.extname(fileName).toLowerCase();
+  const mimetype = MIME_BY_EXT[ext];
+  if (!mimetype) {
+    throw new Error(`Format d'image non pris en charge pour ${fileName}`);
   }
-})();
+
+  return {
+    buffer: fs.readFileSync(path.join(SEED_ASSET_DIR, fileName)),
+    mimetype,
+    ext,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Données de seed
@@ -134,6 +67,7 @@ interface SeedProduct {
   price: number;
   categorySlug: string;
   description: string;
+  imageFiles?: string[];
 }
 
 const SEED_PRODUCTS: SeedProduct[] = [
@@ -146,15 +80,23 @@ const SEED_PRODUCTS: SeedProduct[] = [
   // Informatique
   { name: "Clavier mécanique", price: 35, categorySlug: "informatique", description: "Switchs rouges, rétroéclairage RGB, très agréable pour coder." },
   { name: "Souris gaming", price: 15, categorySlug: "informatique", description: "Souris 6 boutons, capteur 8000 dpi, légèrement usée mais parfaite." },
-  { name: "Disque dur externe 1 To", price: 40, categorySlug: "informatique", description: "SSD externe, formaté, prêt à l'emploi, vendu avec câble USB-C." },
+  { name: "Disque dur externe 1 To", price: 40, categorySlug: "informatique", description: "SSD externe d'occasion, formaté, prêt à l'emploi, vendu avec câble USB-C." },
   { name: "Webcam Full HD", price: 25, categorySlug: "informatique", description: "Webcam 1080p pour cours en ligne, micro intégré." },
   { name: "Hub USB 7 ports", price: 10, categorySlug: "informatique", description: "Hub alimenté, parfait pour brancher clavier, souris et disque." },
+  { name: "Ordinateur portable d'occasion", price: 220, categorySlug: "informatique", description: "Ordinateur utilisé pour mes études, fonctionne correctement. Quelques traces d'usure sur le boîtier, chargeur fourni. Je le vends car je ne l'utilise plus.", imageFiles: ["pc.jpg"] },
+  { name: "Ordinateur Lenovo d'occasion", price: 180, categorySlug: "informatique", description: "Ordinateur portable Lenovo utilisé pour les cours. Fonctionne correctement, avec des marques d'usage.", imageFiles: ["pc1.jpg"] },
+  { name: "Ordinateur portable gris d'occasion", price: 260, categorySlug: "informatique", description: "Ordinateur portable d'occasion en bon état de fonctionnement. Quelques traces d'usure visibles, vendu avec son chargeur.", imageFiles: ["pc2.jpg"] },
   // Livres
-  { name: "Manuel de maths L1", price: 15, categorySlug: "livres", description: "Cours et exercices corrigés, quelques annotations au crayon." },
+  { name: "Manuel de maths L1", price: 15, categorySlug: "livres", description: "Cours et exercices corrigés d'occasion, quelques annotations au crayon." },
   { name: "L'Étranger - Camus", price: 5, categorySlug: "livres", description: "Édition poche en très bon état, lecture obligatoire en licence." },
   { name: "Code civil 2026", price: 12, categorySlug: "livres", description: "Dernière édition, annoté en fluo sur les articles clés." },
   { name: "Biologie cellulaire", price: 10, categorySlug: "livres", description: "Manuel universitaire complet, couverture légèrement pliée." },
   { name: "Dictionnaire anglais-français", price: 8, categorySlug: "livres", description: "800 pages, idéal pour la préparation du TOEIC." },
+  { name: "Lot de livres jeunesse d'occasion", price: 10, categorySlug: "livres", description: "Lot d'albums pour enfants déjà lus. Pages propres et quelques traces d'usage sur les couvertures. Je les vends car ils ne sont plus utilisés.", imageFiles: ["livrej4.PNG", "lvrej1.PNG", "lvrej2.PNG"] },
+  { name: "La Citadelle du musulman", price: 6, categorySlug: "livres", description: "Livre de prières en français et en arabe, déjà utilisé et en bon état. Quelques marques sur la couverture.", imageFiles: ["cita.jpg"] },
+  { name: "Les Invocations Exaucées", price: 7, categorySlug: "livres", description: "Livre d'occasion en français et en arabe, bien conservé avec de légères traces d'usage.", imageFiles: ["inv.jpg"] },
+  { name: "Leçons de Tawhid", price: 8, categorySlug: "livres", description: "Livre d'occasion en bon état, avec de légères marques sur la couverture.", imageFiles: ["taw.jpg"] },
+  { name: "Livre d'apprentissage de l'arabe", price: 5, categorySlug: "livres", description: "Alphabet et exercices pour débuter. Livre d'occasion avec quelques annotations au crayon." },
   // Vêtements
   { name: "Veste de survêtement", price: 25, categorySlug: "vetements", description: "Veste taille M, portée 2 fois, comme neuve." },
   { name: "Jean taille M", price: 18, categorySlug: "vetements", description: "Jean slim, bonne coupe, léger effet usé volontaire." },
@@ -181,7 +123,7 @@ const SEED_PRODUCTS: SeedProduct[] = [
   { name: "Clavier MIDI 49 touches", price: 45, categorySlug: "musique", description: "Idéal pour MAO, pads et molettes en état neuf." },
   { name: "Casque de monitoring", price: 35, categorySlug: "musique", description: "Casque studio, son neutre, confortable." },
   // Vélos
-  { name: "Vélo de ville", price: 90, categorySlug: "velos", description: "Vélo 7 vitesses, révisé, antivol inclus." },
+  { name: "Vélo de ville d'occasion", price: 90, categorySlug: "velos", description: "Vélo 7 vitesses déjà utilisé, révisé et en bon état. Quelques traces d'usure normales. Je le vends car je ne l'utilise plus.", imageFiles: ["velo.PNG", "vello1.PNG", "velloo.PNG", "velloo1.PNG"] },
   { name: "Casque vélo", price: 15, categorySlug: "velos", description: "Taille M, aérations, léger." },
   { name: "Antivol U", price: 10, categorySlug: "velos", description: "Antivol en U avec clés, très robuste." },
   // Autres
@@ -284,21 +226,15 @@ async function main() {
     });
     productIds.push(product.id);
 
-    if (SEED_IMAGES.length > 0) {
-      const img = SEED_IMAGES[i % SEED_IMAGES.length];
-      const key = `uploads/products/seed-${Date.now()}-${i}${img.ext}`;
-      await uploadFile(img.buffer, key, img.mimetype);
-      await prisma.productImage.create({
-        data: { url: key, productId: product.id },
-      });
-    } else {
-      const color = PALETTE[i % PALETTE.length];
-      const png = makePng(800, 600, color);
-      const key = `uploads/products/seed-${Date.now()}-${i}.png`;
-      await uploadFile(png, key, "image/png");
-      await prisma.productImage.create({
-        data: { url: key, productId: product.id },
-      });
+    if (p.imageFiles) {
+      for (const [imageIndex, fileName] of p.imageFiles.entries()) {
+        const img = readSeedImage(fileName);
+        const key = `uploads/products/seed-${Date.now()}-${i}-${imageIndex}${img.ext}`;
+        await uploadFile(img.buffer, key, img.mimetype);
+        await prisma.productImage.create({
+          data: { url: key, productId: product.id },
+        });
+      }
     }
   }
   console.log(`Produits : ${SEED_PRODUCTS.length} OK (images uploadées dans RustFS)`);
