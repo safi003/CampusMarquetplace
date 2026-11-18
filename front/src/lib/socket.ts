@@ -4,14 +4,6 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
-function redirectToLogin() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  window.location.href =
-    "/login?redirect=" + encodeURIComponent(window.location.pathname);
-}
-
 export function getSocket(): Socket | null {
   if (typeof window === "undefined") return null;
 
@@ -25,9 +17,8 @@ export function getSocket(): Socket | null {
       reconnectionAttempts: 3,
     });
 
-    socket.on("connect_error", () => {
-      redirectToLogin();
-      resetSocket();
+    socket.on("connect_error", (error) => {
+      console.error("Erreur de connexion au socket :", error.message);
     });
   }
   return socket;
