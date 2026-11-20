@@ -2,7 +2,7 @@ import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import prisma from "../src/lib/prisma";
-import { uploadFile } from "../src/lib/storage";
+import { uploadFile, removeFile } from "../src/lib/storage";
 
 // ---------------------------------------------------------------------------
 // Photos disponibles dans front/public (monté dans le conteneur backend en production)
@@ -88,6 +88,40 @@ const SEED_PRODUCTS: SeedProduct[] = [
   { name: "Antivol U", price: 10, categorySlug: "velos", description: "Antivol en U avec clés, très robuste.",imageFiles: ["v1.jpg", "vv1.jpg"]  },
 ];
 
+function seedImageKey(fileName: string): string {
+  return `uploads/products/seed-${path.basename(fileName)}`;
+}
+
+async function cleanSeedData() {
+  const oldImages = await prisma.productImage.findMany({
+    where: { url: { startsWith: "uploads/products/seed-" } },
+    select: { url: true, productId: true },
+  });
+
+  const oldProductIds = new Set<number>(oldImages.map((image) => image.productId));
+  const namedProducts = await prisma.product.findMany({
+    where: { name: { in: SEED_PRODUCTS.map((product) => product.name) } },
+    select: { id: true },
+  });
+  namedProducts.forEach((product) => oldProductIds.add(product.id));
+
+  if (oldProductIds.size === 0) return;
+
+  const ids = [...oldProductIds];
+  await prisma.wishlist.deleteMany({ where: { productId: { in: ids } } });
+  await prisma.order.deleteMany({ where: { productId: { in: ids } } });
+  await prisma.productImage.deleteMany({ where: { productId: { in: ids } } });
+  await prisma.product.deleteMany({ where: { id: { in: ids } } });
+
+  for (const image of oldImages) {
+    try {
+      await removeFile(image.url);
+    } catch {}
+  }
+
+  console.log(`Nettoyage : ${ids.length} ancien(s) produit(s) seed supprimé(s)`);
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -118,6 +152,8 @@ async function main() {
     (await prisma.category.findMany()).map((c) => [c.slug, c.id])
   );
   console.log(`Catégories : ${categories.length} OK`);
+
+  await cleanSeedData();
 
   // 2. Utilisateurs (vendeurs de test)
   const users: { id: number; name: string }[] = [];
@@ -168,9 +204,9 @@ async function main() {
     productIds.push(product.id);
 
     if (p.imageFiles) {
-      for (const [imageIndex, fileName] of p.imageFiles.entries()) {
+      for (const fileName of p.imageFiles) {
         const img = readSeedImage(fileName);
-        const key = `uploads/products/seed-${Date.now()}-${i}-${imageIndex}${img.ext}`;
+        const key = seedImageKey(fileName);
         await uploadFile(img.buffer, key, img.mimetype);
         await prisma.productImage.create({
           data: { url: key, productId: product.id },
