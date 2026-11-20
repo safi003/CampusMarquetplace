@@ -3,6 +3,37 @@ import prisma from "../lib/prisma";
 import { uploadFile, generateKey, removeFile } from "../lib/storage";
 import { createProductSchema } from "../validators/product.validator";
 
+function normalizeSearch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function matchesSearch(
+  product: {
+    name: string;
+    description: string;
+    category: { name: string; slug: string } | null;
+  },
+  search: string
+): boolean {
+  const tokens = normalizeSearch(search).split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return true;
+
+  const haystack = normalizeSearch(
+    [
+      product.name,
+      product.description,
+      product.category?.name ?? "",
+      product.category?.slug ?? "",
+    ].join(" ")
+  );
+
+  return tokens.every((token) => haystack.includes(token));
+}
+
 export async function createProduct(req: Request, res: Response) {
   try {
     const parsed = createProductSchema.safeParse(req.body);
@@ -68,9 +99,6 @@ export async function getProducts(req: Request, res: Response) {
     const products = await prisma.product.findMany({
       where: {
         status: "AVAILABLE",
-        ...(search && {
-          name: { contains: String(search), mode: "insensitive" },
-        }),
         ...(categoryId && { categoryId: Number(categoryId) }),
         ...(sellerId && { sellerId: Number(sellerId) }),
       },
@@ -82,7 +110,11 @@ export async function getProducts(req: Request, res: Response) {
       orderBy: { createdAt: "desc" },
     });
 
-    return res.status(200).json(products);
+    const results = search
+      ? products.filter((product) => matchesSearch(product, String(search)))
+      : products;
+
+    return res.status(200).json(results);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Erreur serveur" });

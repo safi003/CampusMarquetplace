@@ -28,18 +28,24 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-16">
-      <section className="flex flex-col items-center gap-6 py-12 text-center">
+      <section className="flex flex-col items-center gap-6 py-14 text-center sm:py-20">
+        <p className="rounded-full border border-[#4AA3A2]/20 bg-[#4AA3A2]/10 px-4 py-2 text-sm font-semibold text-[#2F7372] sm:text-base">
+          Tu ne l’utilises plus ? <span className="font-extrabold">Mais vends-le&nbsp;!</span>
+        </p>
+
         <Text3DFlip
-          className="text-[#4AA3A2] text-3xl sm:text-5xl font-bold flex justify-center flex-wrap"
+          as="h1"
+          className="flex justify-center text-balance text-3xl font-bold text-[#4AA3A2] sm:text-5xl"
           textClassName="text-[#4AA3A2]"
           flipTextClassName="text-[#4AA3A2]"
           rotateDirection="top"
         >
-          Achetez et vendez a petit prix 
+          Achetez et vendez à petit prix
         </Text3DFlip>
 
-        <p className="max-w-xl text-muted-foreground text-lg">
-          Campus Marketplace Trouvez les meilleurs deals sur du matériel de cours, de l&apos;électronique et bien plus encore.
+        <p className="max-w-xl text-lg text-muted-foreground">
+          La marketplace étudiante pour donner une seconde vie à tes objets et
+          trouver de bonnes affaires près de ton campus.
         </p>
 
         <HeroCTA />
