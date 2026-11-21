@@ -122,7 +122,7 @@ export default function SellerTabs({
                   {product.images[0] && (
                     <div className="relative overflow-hidden">
                       <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${product.images[0].url}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${product.images[0].url}`}
                         alt={product.name}
                         className="h-40 w-full object-cover transition-transform group-hover:scale-105"
                       />

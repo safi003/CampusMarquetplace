@@ -111,7 +111,7 @@ export default function OrderDetailPage() {
         <div className="flex items-center gap-4">
           {order.product.images[0] && (
             <img
-              src={`${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${order.product.images[0].url}`}
+              src={`${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${order.product.images[0].url}`}
               alt={order.product.name}
               className="h-16 w-16 rounded-lg object-cover border"
             />

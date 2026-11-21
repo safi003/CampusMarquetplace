@@ -98,7 +98,7 @@ function OrderCard({
     >
       {order.product.images[0] ? (
         <img
-          src={`${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${order.product.images[0].url}`}
+          src={`${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${order.product.images[0].url}`}
           alt={order.product.name}
           className="h-16 w-16 flex-shrink-0 rounded-lg object-cover border"
         />

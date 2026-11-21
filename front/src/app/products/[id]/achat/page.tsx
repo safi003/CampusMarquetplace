@@ -34,7 +34,7 @@ export default async function AchatPage({
       <div className="mt-6 flex items-center gap-4 rounded-xl border border-border bg-card p-4">
         {product.images[0] && (
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${product.images[0].url}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${product.images[0].url}`}
             alt={product.name}
             className="h-20 w-20 rounded-lg object-cover border"
           />

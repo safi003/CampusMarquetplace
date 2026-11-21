@@ -55,7 +55,7 @@ function StatusBadge({ status }: { status: AdminUser["cardStatus"] }) {
 
 function CardImageThumb({ user }: { user: AdminUser }) {
   const url = user.imageCarteScolaire
-    ? `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${user.imageCarteScolaire}`
+    ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${user.imageCarteScolaire}`
     : null;
   if (!url) {
     return <span className="text-xs text-muted-foreground">Aucune carte</span>;

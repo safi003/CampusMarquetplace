@@ -11,7 +11,7 @@ export function getSocket(): Socket | null {
   if (!token) return null;
 
   if (!socket) {
-    socket = io(process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ?? "", {
+    socket = io(process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") ?? "", {
       auth: { token },
       transports: ["websocket"],
       reconnectionAttempts: 3,

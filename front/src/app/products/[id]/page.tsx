@@ -78,7 +78,7 @@ export default async function ProductDetailPage({
               {product.images.map((img) => (
                 <CarouselItem key={img.id}>
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${img.url}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${img.url}`}
                     alt={product.name}
                     className="w-full h-80 object-contain bg-gray-100 rounded"
                   />
