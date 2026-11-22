@@ -295,12 +295,12 @@ export default function MainNav() {
               )}
               {user && (
                 <div onClick={() => setIsOpen(false)}>
-                  <MessagesNavLink className="px-0" />
+                  <MessagesNavLink className="!flex-row !items-center !gap-1.5 px-0" />
                 </div>
               )}
               {user && (
                 <div onClick={() => setIsOpen(false)}>
-                  <NotificationsNavLink className="px-0" />
+                  <NotificationsNavLink className="!flex-row !items-center !gap-1.5 px-0" />
                 </div>
               )}
               <div className="flex w-full flex-col gap-2 pt-4">
@@ -357,7 +357,7 @@ export default function MainNav() {
                   <NavbarButton
                     href="/login"
                     variant="secondary"
-                    className="h-12 w-full flex-col gap-0.5 px-2 text-xs leading-tight"
+                    className="flex h-12 w-full flex-row items-center justify-center gap-0.5 px-2 text-xs leading-tight"
                   >
                     <User className="h-5 w-5" />
                     Se connecter
