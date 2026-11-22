@@ -36,9 +36,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --font-nunito-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans:
-    var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    var(--font-nunito-sans), "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @theme inline {
@@ -78,7 +79,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-nunito-sans);
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {

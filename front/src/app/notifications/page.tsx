@@ -46,10 +46,10 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (user && token) {
       void load();
-    } else {
-      setLoading(false);
     }
   }, [user, token, load]);
+
+  const showLoading = user && token ? loading : false;
 
   async function markAllRead() {
     await apiFetch(`/notifications/read-all`, { method: "POST" });
@@ -83,7 +83,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {loading ? (
+      {showLoading ? (
         <p className="py-12 text-center text-muted-foreground">Chargement...</p>
       ) : notifications.length === 0 ? (
         <p className="py-12 text-center text-muted-foreground">Aucune notification pour le moment.</p>

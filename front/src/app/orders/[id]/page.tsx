@@ -26,21 +26,22 @@ function useCountdown(expiresAt: string | null) {
 
   useEffect(() => {
     if (!expiresAt) {
-      setRemaining(null);
       return;
     }
     const target = new Date(expiresAt).getTime();
 
     const tick = () => {
-      const diff = Math.max(0, target - Date.now());
-      setRemaining(diff);
+      setRemaining(Math.max(0, target - Date.now()));
     };
-    tick();
+    const timeout = setTimeout(tick, 0);
     const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
   }, [expiresAt]);
 
-  return remaining;
+  return expiresAt ? remaining : null;
 }
 
 function formatCountdown(ms: number) {
@@ -56,7 +57,16 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [currentUserId] = useState<number | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem("user");
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored).id ?? null;
+    } catch {
+      return null;
+    }
+  });
 
   const fetchOrder = useCallback(async () => {
     try {
@@ -64,20 +74,25 @@ export default function OrderDetailPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur de chargement");
       setOrder(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur de chargement");
     } finally {
       setLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
-    fetchOrder();
-    const stored = localStorage.getItem("user");
-    if (stored) setCurrentUserId(JSON.parse(stored).id);
+    const timeout = setTimeout(() => {
+      void fetchOrder();
+    }, 0);
 
-    const interval = setInterval(fetchOrder, 15000); // resync toutes les 15s
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      void fetchOrder();
+    }, 15000); // resync toutes les 15s
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
   }, [fetchOrder]);
 
   const remaining = useCountdown(order?.status === "ACTIVE" ? order.expiresAt : null);
@@ -89,8 +104,8 @@ export default function OrderDetailPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur");
       setOrder((prev) => (prev ? { ...prev, ...data } : data));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur");
     } finally {
       setConfirming(false);
     }

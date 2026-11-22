@@ -144,12 +144,16 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"buyer" | "seller">("buyer");
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-
-  useEffect(() => {
+  const [currentUserId] = useState<number | null>(() => {
+    if (typeof window === "undefined") return null;
     const stored = localStorage.getItem("user");
-    if (stored) setCurrentUserId(JSON.parse(stored).id);
-  }, []);
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored).id ?? null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     async function fetchOrders() {
@@ -158,13 +162,13 @@ export default function OrdersPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Erreur de chargement");
         setOrders(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Erreur de chargement");
       } finally {
         setLoading(false);
       }
     }
-    fetchOrders();
+    void fetchOrders();
   }, []);
 
   const buyerOrders = orders.filter((o) => o.buyer.id === currentUserId);

@@ -270,9 +270,6 @@ async function releasePayment(id: number) {
   const pendingVerif = orders.filter(
     (o) => o.paymentType === "SECURED" && o.paymentStatus === "NONE"
   );
-  const heldToRelease = orders.filter(
-    (o) => o.paymentType === "SECURED" && o.paymentStatus === "HELD" && o.status === "COMPLETED"
-  );
 
   return (
     <>

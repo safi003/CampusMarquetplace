@@ -38,8 +38,8 @@ export default function AchatOptions({
       }
 
       router.push(`/orders/${data.id}`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Impossible de réserver ce produit");
       setLoading(null);
     }
   }
