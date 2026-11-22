@@ -44,8 +44,8 @@ export default async function HomePage() {
         </Text3DFlip>
 
         <p className="max-w-xl text-lg text-muted-foreground">
-          La marketplace étudiante pour donner une seconde vie à tes objets et
-          trouver de bonnes affaires près de ton campus.
+          La marketplace pour donner une seconde vie à tes objets et
+          trouver de bonnes affaires près de ta ville.
         </p>
 
         <HeroCTA />

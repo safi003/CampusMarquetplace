@@ -101,10 +101,19 @@ export default function MainNav() {
           <NavBody>
             <Link
               href="/"
-              className="relative z-20 flex shrink-0 items-center px-1 py-1 text-sm font-normal"
+              className="group relative z-20 flex shrink-0 items-center gap-3 px-1 py-1"
+              aria-label="Campus Marketplace - Accueil"
             >
-              <span className="font-bold tracking-tight text-3xl text-[#4AA3A2]">
-                Campus Marketplace
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#4AA3A2] to-[#236f6e] text-sm font-extrabold tracking-tight text-white shadow-md shadow-[#4AA3A2]/25 ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105">
+                CM
+              </span>
+              <span className="flex flex-col leading-none">
+                <span className="text-[1.15rem] font-extrabold tracking-tight text-slate-900">
+                  Campus
+                </span>
+                <span className="text-sm font-semibold tracking-tight text-[#4AA3A2]">
+                  Marketplace
+                </span>
               </span>
             </Link>
 
@@ -215,9 +224,20 @@ export default function MainNav() {
             <MobileNavHeader>
               <Link
                 href="/"
-                className="text-base font-semibold tracking-tight text-foreground"
+                className="flex items-center gap-2.5"
+                aria-label="Campus Marketplace - Accueil"
               >
-                <span className="text-[#4AA3A2] site-mobile-wordmark">Campus Marketplace</span>
+                <span className="site-mobile-logo flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#4AA3A2] to-[#236f6e] text-xs font-extrabold tracking-tight text-white shadow-sm shadow-[#4AA3A2]/20">
+                  CM
+                </span>
+                <span className="site-mobile-wordmark flex items-baseline gap-1 whitespace-nowrap">
+                  <span className="text-base font-extrabold tracking-tight text-slate-900">
+                    Campus
+                  </span>
+                  <span className="text-base font-semibold tracking-tight text-[#4AA3A2]">
+                    Marketplace
+                  </span>
+                </span>
               </Link>
               <MobileNavToggle isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
             </MobileNavHeader>

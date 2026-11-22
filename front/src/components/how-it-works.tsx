@@ -34,8 +34,8 @@ export default function HowItWorks() {
             </div>
             <h3 className="text-lg font-semibold text-foreground">Paiement sécurisé</h3>
             <p className="max-w-md text-sm text-muted-foreground">
-              L&apos;acheteur peut payer en ligne par carte bancaire. Nous conservons l&apos;argent
-              et ne le versemos au vendeur que si l&apos;acheteur confirme que tout est conforme,
+              L&apos;acheteur peut payer en ligne par orange money ou wave. Nous conservons l&apos;argent
+              et ne le verserons au vendeur que si l&apos;acheteur confirme que tout est conforme,
               que ce soit en livraison ou en remise en main propre.
             </p>
           </div>

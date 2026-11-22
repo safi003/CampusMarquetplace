@@ -85,7 +85,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  font-weight: 200;
+  font-weight: 400;
 }
 
 .site-header {
@@ -175,6 +175,10 @@ body {
   .site-header.is-scrolled .site-mobile-wordmark {
     max-width: 0;
     opacity: 0;
+  }
+
+  .site-header.is-scrolled .site-mobile-logo {
+    display: none;
   }
 
   .site-header.is-scrolled .site-mobile-search {
