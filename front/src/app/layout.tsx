@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import MainNav from "@/components/main-nav";
 import { AuthProvider } from "@/contexts/auth-context";
@@ -7,6 +7,12 @@ import { Footer } from "@/components/footer";
 export const metadata: Metadata = {
   title: "Campus Marketplace",
   description: "Achetez et vendez entre étudiants",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#4AA3A2",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -17,6 +17,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const statusLabel: Record<string, { text: string; className: string }> = {
+  PENDING: {
+    text: "En attente de vérification",
+    className: "border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#2F7372]",
+  },
+  APPROVED: {
+    text: "Compte vérifié",
+    className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700",
+  },
+  REJECTED: {
+    text: "Pièce refusée",
+    className: "border-red-500/30 bg-red-500/10 text-red-700",
+  },
+};
+
 export default function CarteScolairePage() {
   const router = useRouter();
   const { user, refreshUser } = useAuth();
@@ -82,14 +97,34 @@ export default function CarteScolairePage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="flex flex-col gap-4">
-            <div className="rounded-lg bg-[#4AA3A2]/10 border border-[#4AA3A2]/20 px-4 py-3 text-sm text-[#4AA3A2]">
+            <div className="rounded-lg border border-[#4AA3A2]/20 bg-[#4AA3A2]/10 px-4 py-3 text-sm text-[#4AA3A2]">
               <span className="font-semibold">Confidentiel :</span> votre pièce d&apos;identité
               sert uniquement à vérifier votre identité. Elle n&apos;est
               jamais visible par les autres utilisateurs.
             </div>
 
+            <div className="flex flex-wrap gap-2">
+              {user.cardStatus && statusLabel[user.cardStatus] && (
+                <span
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusLabel[user.cardStatus].className}`}
+                >
+                  {statusLabel[user.cardStatus].text}
+                </span>
+              )}
+              {user.imageCarteScolaire && (
+                <span className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-foreground">
+                  Pièce d&apos;identité envoyée
+                </span>
+              )}
+              {!user.imageCarteScolaire && !user.cardStatus && (
+                <span className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
+                  Aucune pièce envoyée
+                </span>
+              )}
+            </div>
+
             {user.cardStatus === "PENDING" && (
-              <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#4AA3A2]">
+              <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#2F7372]">
                 <AlertDescription>
                   Votre pièce d&apos;identité est en attente de vérification. Un administrateur va la vérifier. Vous pourrez publier des annonces une fois votre compte validé.
                 </AlertDescription>
@@ -111,10 +146,10 @@ export default function CarteScolairePage() {
               </Alert>
             )}
 
-            {user.imageCarteScolaire && user.cardStatus !== "PENDING" && (
-              <Alert variant="default" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
+            {user.imageCarteScolaire && user.cardStatus === "APPROVED" && (
+              <Alert className="border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
                 <AlertDescription>
-                  Pièce d&apos;identité déjà ajoutée. Vous pouvez en envoyer une nouvelle pour la remplacer.
+                  Une pièce d&apos;identité est enregistrée sur votre compte. Vous pouvez en envoyer une nouvelle si nécessaire.
                 </AlertDescription>
               </Alert>
             )}
@@ -149,8 +184,26 @@ export default function CarteScolairePage() {
               </div>
             )}
           </CardContent>
-          {(user.cardStatus === "PENDING" || user.cardStatus === "APPROVED") ? (
+          {user.cardStatus === "PENDING" ? (
             <CardFooter className="flex flex-col gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => router.push("/")}
+              >
+                Retour à l&apos;accueil
+              </Button>
+            </CardFooter>
+          ) : user.cardStatus === "APPROVED" ? (
+            <CardFooter className="flex flex-col gap-3">
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => router.push("/products")}
+              >
+                Déposer une annonce
+              </Button>
               <Button
                 type="button"
                 variant="outline"
