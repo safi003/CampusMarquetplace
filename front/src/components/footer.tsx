@@ -8,7 +8,7 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-bold text-[#4AA3A2] mb-3">Campus Marketplace</h3>
             <p className="text-sm text-muted-foreground">
-              Achetez et vendez entre étudiants sur votre campus.
+              Achetez et vendez sur notre platforme.
             </p>
           </div>
 
@@ -45,7 +45,7 @@ export function Footer() {
       </div>
 
       <div className=" w-full flex items-center justify-center   ">
-          <h1 className="text-center text-3xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text  text-[#4AA3A2] bg-gradient-to-b from-neutral-700 to-neutral-900 select-none">
+          <h1 className="text-center text-5xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text  text-[#4AA3A2] bg-gradient-to-b from-neutral-700 to-neutral-900 select-none">
             Market Place
           </h1>
       </div>

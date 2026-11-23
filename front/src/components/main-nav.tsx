@@ -260,17 +260,17 @@ export default function MainNav() {
                   key={item.name}
                   href={item.link}
                   onClick={() => setIsOpen(false)}
-                  className="text-neutral-600 dark:text-neutral-300"
+                  className="text-muted-foreground"
                 >
                   {item.name}
                 </a>
               ))}
               {isAdmin && (
-                <a
-                  href="/admin"
-                  onClick={() => setIsOpen(false)}
-                  className="inline-flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300"
-                >
+            <a
+              href={item.link}
+              onClick={() => setIsOpen(false)}
+              className="text-muted-foreground"
+            >
                   <ShieldCheck className="h-4 w-4" />
                   Admin
                 </a>
@@ -278,7 +278,7 @@ export default function MainNav() {
               <a
                 href="/wishlist"
                 onClick={() => setIsOpen(false)}
-                className="inline-flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300"
+                className="inline-flex items-center gap-1.5 text-muted-foreground"
               >
                 <Heart className="h-4 w-4" />
                 Favoris
@@ -287,7 +287,7 @@ export default function MainNav() {
                 <Link
                   href="/orders"
                   onClick={() => setIsOpen(false)}
-                  className="inline-flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   Commandes
@@ -304,7 +304,7 @@ export default function MainNav() {
                 </div>
               )}
               <div className="flex w-full flex-col gap-2 pt-4">
-                <NavbarButton href={publishHref} variant="primary" className="w-full">
+                <NavbarButton href={publishHref} variant="primary" className="w-full bg-[#4AA3A2]">
                   <PlusCircle className="mr-1 inline h-4 w-4" />
                   Déposer une annonce
                 </NavbarButton>
