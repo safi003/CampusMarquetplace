@@ -265,8 +265,8 @@ async function releasePayment(id: number) {
     return <div className="flex justify-center py-16 text-muted-foreground">Chargement...</div>;
   }
 
-  const pendingCount = users.filter((u) => u.cardStatus === "PENDING").length;
-  const pendingUsers = users.filter((u) => u.cardStatus !== "APPROVED");
+  const pendingCount = users.filter((u) => u.cardStatus === "PENDING" && !!u.imageCarteScolaire).length;
+  const pendingUsers = users.filter((u) => u.cardStatus !== "APPROVED" && !!u.imageCarteScolaire);
   const pendingVerif = orders.filter(
     (o) => o.paymentType === "SECURED" && o.paymentStatus === "NONE"
   );

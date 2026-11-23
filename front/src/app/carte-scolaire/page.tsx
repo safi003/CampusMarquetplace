@@ -104,7 +104,7 @@ export default function CarteScolairePage() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {user.cardStatus && statusLabel[user.cardStatus] && (
+              {user.cardStatus && statusLabel[user.cardStatus] && (user.cardStatus !== "PENDING" || !!user.imageCarteScolaire) && (
                 <span
                   className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusLabel[user.cardStatus].className}`}
                 >
@@ -116,14 +116,14 @@ export default function CarteScolairePage() {
                   Pièce d&apos;identité envoyée
                 </span>
               )}
-              {!user.imageCarteScolaire && !user.cardStatus && (
+              {!user.imageCarteScolaire && (
                 <span className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
                   Aucune pièce envoyée
                 </span>
               )}
             </div>
 
-            {user.cardStatus === "PENDING" && (
+            {user.cardStatus === "PENDING" && !!user.imageCarteScolaire && (
               <Alert className="border-[#4AA3A2]/30 bg-[#4AA3A2]/10 text-[#2F7372]">
                 <AlertDescription>
                   Votre pièce d&apos;identité est en attente de vérification. Un administrateur va la vérifier. Vous pourrez publier des annonces une fois votre compte validé.
@@ -168,7 +168,7 @@ export default function CarteScolairePage() {
               </Alert>
             )}
 
-            {user.cardStatus !== "PENDING" && user.cardStatus !== "APPROVED" && (
+            {(user.cardStatus !== "PENDING" || !user.imageCarteScolaire) && user.cardStatus !== "APPROVED" && (
               <div className="flex flex-col gap-2">
                 <Label htmlFor="carte">Photo de la pièce d&apos;identité</Label>
                 <Input
@@ -184,7 +184,7 @@ export default function CarteScolairePage() {
               </div>
             )}
           </CardContent>
-          {user.cardStatus === "PENDING" ? (
+          {user.cardStatus === "PENDING" && !!user.imageCarteScolaire ? (
             <CardFooter className="flex flex-col gap-3">
               <Button
                 type="button"
