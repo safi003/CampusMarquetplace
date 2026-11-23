@@ -265,11 +265,11 @@ export default function MainNav() {
                   {item.name}
                 </a>
               ))}
-              {isAdmin && (
+               {isAdmin && (
             <a
-              href={item.link}
+              href="/admin"
               onClick={() => setIsOpen(false)}
-              className="text-muted-foreground"
+              className="inline-flex items-center gap-1.5 text-muted-foreground"
             >
                   <ShieldCheck className="h-4 w-4" />
                   Admin
