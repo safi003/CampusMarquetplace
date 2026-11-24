@@ -526,3 +526,51 @@ async function sendAdminMessage(
     link: "/chat",
   });
 }
+
+export async function lockDirectOrder(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        product: { select: { name: true } },
+        buyer: { select: { name: true } },
+        seller: { select: { name: true } },
+      },
+    });
+    if (!order) {
+      return res.status(404).json({ message: "Commande introuvable" });
+    }
+    if (order.sellerId !== req.user!.id && req.user!.role !== "ADMIN") {
+      return res.status(403).json({ message: "Vous n'êtes pas le vendeur de ce produit" });
+    }
+    if (order.paymentType !== "DIRECT") {
+      return res.status(400).json({ message: "Cette commande n'est pas en paiement direct" });
+    }
+    if (order.status !== "ACTIVE") {
+      return res.status(400).json({ message: "Seule une commande active peut être bloquée" });
+    }
+    if (order.sellerLockedPayment) {
+      return res.status(400).json({ message: "Ce produit est déjà bloqué" });
+    }
+
+    const updated = await prisma.order.update({
+      where: { id },
+      data: { sellerLockedPayment: true },
+    });
+
+    const io = req.app.get("io");
+    await notifyUser(io, {
+      userId: order.buyerId,
+      type: "PAYMENT_LOCKED",
+      content: `Le vendeur a confirmé la réception de votre paiement pour "${order.product.name}". Le produit est maintenant bloqué pour vous.`,
+      link: `/orders/${id}`,
+    });
+
+    return res.status(200).json(updated);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+}

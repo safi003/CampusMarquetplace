@@ -173,6 +173,7 @@ model Order {
   paymentType          PaymentType   @default(SECURED)
   paymentStatus        PaymentStatus @default(NONE)
   paymentLockedByStaff Boolean       @default(false)
+  sellerLockedPayment  Boolean       @default(false)
 
   buyerConfirmed  Boolean @default(false)
   sellerConfirmed Boolean @default(false)

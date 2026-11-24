@@ -93,7 +93,7 @@ export default async function ProductDetailPage({
             <div>
               <h1 className="text-2xl font-bold">{product.name}</h1>
               <p className="text-gray-500">{product.category.name}</p>
-              <p className="text-xl font-semibold mt-2">{product.price} FCFA</p>
+              <p className="text-xl font-semibold mt-2">{product.price} </p>
             </div>
 
             <p>{product.description}</p>

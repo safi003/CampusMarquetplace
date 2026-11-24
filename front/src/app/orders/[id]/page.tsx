@@ -15,6 +15,7 @@ interface OrderDetail {
   paymentStatus: "NONE" | "HELD" | "RELEASED" | "REFUNDED";
   buyerConfirmed: boolean;
   sellerConfirmed: boolean;
+  sellerLockedPayment: boolean;
   expiresAt: string | null;
   buyer: { id: number; name: string };
   seller: { id: number; name: string };
@@ -57,6 +58,7 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [locking, setLocking] = useState(false);
   const [currentUserId] = useState<number | null>(() => {
     if (typeof window === "undefined") return null;
     const stored = localStorage.getItem("user");
@@ -111,12 +113,26 @@ export default function OrderDetailPage() {
     }
   }
 
+  async function handleLock() {
+  setLocking(true);
+  try {
+    const res = await apiFetch(`/orders/${id}/lock-direct`, { method: "PATCH" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erreur");
+    setOrder((prev) => (prev ? { ...prev, ...data } : data));
+  } catch (err: unknown) {
+    setError(err instanceof Error ? err.message : "Erreur");
+  } finally {
+    setLocking(false);
+  }
+}
+
   if (loading) return <div className="p-6 text-center text-muted-foreground">Chargement...</div>;
   if (error && !order) return <div className="p-6 text-center text-red-500">{error}</div>;
   if (!order) return null;
 
   const isBuyer = currentUserId === order.buyer.id;
-  const myConfirmation = isBuyer ? order.buyerConfirmed : order.sellerConfirmed;
+  const isSeller = currentUserId === order.seller.id;  const myConfirmation = isBuyer ? order.buyerConfirmed : order.sellerConfirmed;
   const otherConfirmation = isBuyer ? order.sellerConfirmed : order.buyerConfirmed;
   const otherName = isBuyer ? order.seller.name : order.buyer.name;
 
@@ -157,7 +173,7 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Statuts */}
-        {order.status === "ACTIVE" && remaining !== null && (
+        {order.status === "ACTIVE" && !order.sellerLockedPayment && remaining !== null && (
           <div className="mt-4 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
             <Clock className="h-4 w-4" />
             {remaining > 0 ? (
@@ -201,6 +217,23 @@ export default function OrderDetailPage() {
             {otherConfirmation && !myConfirmation && (
               <p className="text-xs text-[#4AA3A2]">{otherName} a déjà confirmé de son côté.</p>
             )}
+          </div>
+        )}
+
+        {/*confirmation vendeur */}
+        {order.paymentType === "DIRECT" && isSeller && order.status === "ACTIVE" && !order.sellerLockedPayment && (
+          <div className="mt-5 flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">
+              Vous avez reçu l&apos;argent du client ? Bloquez le produit pour lui.            </p>
+            <Button onClick={handleLock} disabled={locking} className="w-full" variant="outline">
+            {locking ? "Blocage..." : "J'ai reçu l'argent — bloquer le produit"}
+            </Button>
+          </div>
+        )}
+
+        {order.paymentType === "DIRECT" && order.sellerLockedPayment && (
+          <div className="mt-4 rounded-lg bg-[#4AA3A2]/10 px-3 py-2 text-sm text-[#4AA3A2]">
+            Produit bloqué — paiement reçu par le vendeur.
           </div>
         )}
 

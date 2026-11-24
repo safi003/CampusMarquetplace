@@ -9,6 +9,7 @@ import {
   releasePayment,
   lockSecuredOrder,
   getOrderById,
+  lockDirectOrder
 } from "../controllers/order.controller";
 import { authenticate, requireAdmin } from "../middlewares/auth.middleware";
 
@@ -23,5 +24,7 @@ router.patch("/:id/activate", authenticate, activateOrder);
 router.patch("/:id/confirm", authenticate, confirmOrder);
 router.patch("/:id/release-payment", authenticate, requireAdmin, releasePayment);
 router.patch("/:id/lock-secured", authenticate, requireAdmin, lockSecuredOrder);
+router.patch("/:id/lock-direct", authenticate, lockDirectOrder);
+
 
 export default router;
