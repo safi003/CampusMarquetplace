@@ -30,7 +30,6 @@ export default function OrdersNavLink({
     let active = true;
     const userId = user.id;
 
-
     async function load() {
       try {
         const res = await apiFetch("/orders");
@@ -43,7 +42,8 @@ export default function OrdersNavLink({
           ? orders.filter(
               (o) =>
                 (o.buyer.id === userId && o.status === "ACTIVE") ||
-                (o.seller.id === userId && o.status === "PENDING")
+                (o.seller.id === userId &&
+                  (o.status === "ACTIVE" || o.status === "PENDING")),
             ).length
           : 0;
 
