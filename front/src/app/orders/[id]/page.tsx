@@ -73,8 +73,8 @@ export default function OrderDetailPage() {
   const fetchOrder = useCallback(async () => {
     try {
       const res = await apiFetch(`/orders/${id}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Erreur de chargement");
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || `Erreur ${res.status} lors du chargement`);
       setOrder(data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur de chargement");
@@ -101,10 +101,11 @@ export default function OrderDetailPage() {
 
   async function handleConfirm() {
     setConfirming(true);
+    setError(null);
     try {
       const res = await apiFetch(`/orders/${id}/confirm`, { method: "PATCH" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Erreur");
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || `Erreur ${res.status}`);
       setOrder((prev) => (prev ? { ...prev, ...data } : data));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur");
@@ -114,18 +115,19 @@ export default function OrderDetailPage() {
   }
 
   async function handleLock() {
-  setLocking(true);
-  try {
-    const res = await apiFetch(`/orders/${id}/lock-direct`, { method: "PATCH" });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Erreur");
-    setOrder((prev) => (prev ? { ...prev, ...data } : data));
-  } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : "Erreur");
-  } finally {
-    setLocking(false);
+    setLocking(true);
+    setError(null);
+    try {
+      const res = await apiFetch(`/orders/${id}/lock-direct`, { method: "PATCH" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || `Erreur ${res.status}`);
+      setOrder((prev) => (prev ? { ...prev, ...data } : data));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setLocking(false);
+    }
   }
-}
 
   if (loading) return <div className="p-6 text-center text-muted-foreground">Chargement...</div>;
   if (error && !order) return <div className="p-6 text-center text-red-500">{error}</div>;
