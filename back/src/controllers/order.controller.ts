@@ -50,6 +50,7 @@ export async function createOrder(req: Request, res: Response) {
     }
 
     await checkAndExpireActiveOrder(productId);
+    const io = req.app.get("io") as Server | undefined;
 
     const order = await prisma.$transaction(async (tx) => {
       const hasActiveOrder = await tx.order.findFirst({
@@ -87,14 +88,16 @@ export async function createOrder(req: Request, res: Response) {
         product.sellerId,
         "NEW_ORDER",
         `${order!.buyer.name} souhaite acheter "${product.name}"`,
-        `/orders/${order!.id}`
+        `/orders/${order!.id}`,
+        io
       );
     } else {
       await notify(
         product.sellerId,
         "NEW_ORDER_WAITING",
         `${order!.buyer.name} veut aussi acheter "${product.name}" (en file d'attente)`,
-        `/orders/product/${product.id}/queue`
+        `/orders/product/${product.id}/queue`,
+        io
       );
     }
 
@@ -238,9 +241,10 @@ export async function updateOrderStatus(req: Request, res: Response) {
 
       return tx.order.findUnique({ where: { id }, include: orderInclude });
     });
+    const io = req.app.get("io") as Server | undefined;
 
     const recipientId = order.buyerId === req.user!.id ? order.sellerId : order.buyerId;
-    await notify(recipientId, "ORDER_CANCELLED", "Une commande a été annulée", `/orders/${id}`);
+    await notify(recipientId, "ORDER_CANCELLED", "Une commande a été annulée", `/orders/${id}`,io);
 
     return res.status(200).json(updated);
   } catch (error) {
@@ -340,6 +344,22 @@ export async function activateOrder(req: Request, res: Response) {
       return activated;
     });
 
+    const io = req.app.get("io") as Server | undefined;
+
+await notifyUser(io, {
+  userId: order.buyerId,
+  type: "ORDER_ACTIVATED",
+  content: `Votre commande pour "${order.product.name}" est activée. Vous avez 15 minutes pour confirmer.`,
+  link: `/orders/${id}`,
+});
+
+await notifyUser(io, {
+  userId: order.sellerId,
+  type: "ORDER_ACTIVATED",
+  content: `La commande de "${order.product.name}" est activée.`,
+  link: `/orders/${id}`,
+});
+
     return res.status(200).json(updated);
   } catch (error: any) {
     if (error.status) {
@@ -384,6 +404,7 @@ export async function confirmOrder(req: Request, res: Response) {
         data,
         include: orderInclude,
       });
+      const io = req.app.get("io") as Server | undefined;
       const recipientId = isBuyer ? confirmed.sellerId : confirmed.buyerId;
       await notify(
         recipientId,
@@ -391,7 +412,8 @@ export async function confirmOrder(req: Request, res: Response) {
         isBuyer
           ? `${confirmed.buyer.name} a confirmé la transaction, à votre tour`
           : `${confirmed.seller.name} a confirmé la transaction, à votre tour`,
-        `/orders/${id}`
+        `/orders/${id}`,
+        io
       );
 
       if (confirmed.buyerConfirmed && confirmed.sellerConfirmed) {

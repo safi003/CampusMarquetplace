@@ -1,4 +1,6 @@
+import type { Server } from "socket.io";
 import prisma from "../lib/prisma";
+import { notifyUser } from "../lib/notify";
 
 export async function checkAndExpireActiveOrder(productId: number) {
   const active = await prisma.order.findFirst({
@@ -55,9 +57,14 @@ export async function notify(
   userId: number,
   type: string,
   content: string,
-  link?: string
+  link: string | undefined,
+  io?: Server | null
 ) {
+  if (io) {
+    return notifyUser(io, { userId, type, content, link });
+  }
+
   return prisma.notification.create({
-    data: { userId, type, content, link },
+    data: { userId, type, content, link: link ?? null },
   });
 }
