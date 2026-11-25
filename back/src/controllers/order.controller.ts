@@ -176,33 +176,71 @@ export async function updateOrderStatus(req: Request, res: Response) {
     if (!parsed.success) {
       return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
     }
-    const { status } = parsed.data;
-    const id = Number(req.params.id);
 
+    const id = Number(req.params.id);
     const order = await prisma.order.findUnique({ where: { id } });
+
     if (!order) {
       return res.status(404).json({ message: "Commande introuvable" });
     }
     if (order.buyerId !== req.user!.id && order.sellerId !== req.user!.id) {
-      return res
-        .status(403)
-        .json({ message: "Vous ne participez pas à cette commande" });
+      return res.status(403).json({ message: "Vous ne participez pas à cette commande" });
+    }
+    if (order.status !== "PENDING" && order.status !== "ACTIVE") {
+      return res.status(400).json({ message: "Cette commande ne peut plus être annulée" });
+    }
+    if (
+      order.status === "ACTIVE" &&
+      (order.paymentLockedByStaff || order.sellerLockedPayment)
+    ) {
+      return res.status(400).json({ message: "Paiement déjà verrouillé — annulation impossible" });
     }
 
     const updated = await prisma.$transaction(async (tx) => {
-      if (status === "CANCELLED" && order.status === "PENDING") {
-        await tx.product.update({
-          where: { id: order.productId },
-          data: { status: "AVAILABLE" },
+      await tx.order.update({
+        where: { id },
+        data: { status: "CANCELLED", expiresAt: null },
+      });
+
+      if (order.status === "ACTIVE") {
+        const next = await tx.order.findFirst({
+          where: { productId: order.productId, status: "PENDING" },
+          orderBy: { createdAt: "asc" },
         });
+
+        if (next) {
+          await tx.order.update({
+            where: { id: next.id },
+            data: {
+              status: "ACTIVE",
+              activatedAt: new Date(),
+              expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+            },
+          });
+        } else {
+          await tx.product.update({
+            where: { id: order.productId },
+            data: { status: "AVAILABLE" },
+          });
+        }
+      } else {
+        const stillActive = await tx.order.findFirst({
+          where: { productId: order.productId, status: "ACTIVE" },
+        });
+
+        if (!stillActive) {
+          await tx.product.update({
+            where: { id: order.productId },
+            data: { status: "AVAILABLE" },
+          });
+        }
       }
 
-      return tx.order.update({
-        where: { id },
-        data: { status },
-        include: orderInclude,
-      });
+      return tx.order.findUnique({ where: { id }, include: orderInclude });
     });
+
+    const recipientId = order.buyerId === req.user!.id ? order.sellerId : order.buyerId;
+    await notify(recipientId, "ORDER_CANCELLED", "Une commande a été annulée", `/orders/${id}`);
 
     return res.status(200).json(updated);
   } catch (error) {

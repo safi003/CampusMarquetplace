@@ -7,5 +7,5 @@ export const createOrderSchema = z.object({
 });
 
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(["ACTIVE", "COMPLETED", "CANCELLED", "EXPIRED"]),
+  status: z.enum(["CANCELLED"]),
 });
