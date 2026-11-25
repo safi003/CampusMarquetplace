@@ -181,24 +181,32 @@ export async function updateOrderStatus(req: Request, res: Response) {
     }
 
     const id = Number(req.params.id);
-    const order = await prisma.order.findUnique({ where: { id } });
+    const current = await prisma.order.findUnique({ where: { id } });
+    if (!current) {
+      return res.status(404).json({ message: "Commande introuvable" });
+    }
 
+    if (current.buyerId !== req.user!.id && current.sellerId !== req.user!.id) {
+      return res.status(403).json({ message: "Vous ne participez pas à cette commande" });
+    }
+
+    await checkAndExpireActiveOrder(current.productId);
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: orderInclude,
+    });
     if (!order) {
       return res.status(404).json({ message: "Commande introuvable" });
     }
-    if (order.buyerId !== req.user!.id && order.sellerId !== req.user!.id) {
-      return res.status(403).json({ message: "Vous ne participez pas à cette commande" });
+
+    if (order.status === "EXPIRED") {
+      return res.status(200).json(order);
     }
+
     if (order.status !== "PENDING" && order.status !== "ACTIVE") {
       return res.status(400).json({ message: "Cette commande ne peut plus être annulée" });
     }
-    if (
-      order.status === "ACTIVE" &&
-      (order.paymentLockedByStaff || order.sellerLockedPayment)
-    ) {
-      return res.status(400).json({ message: "Paiement déjà verrouillé — annulation impossible" });
-    }
-
     const updated = await prisma.$transaction(async (tx) => {
       await tx.order.update({
         where: { id },
