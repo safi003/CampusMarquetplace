@@ -20,11 +20,11 @@ import {
   Music,
   Ellipsis,
   ShieldCheck,
-  ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import MessagesNavLink from "@/components/messages-nav-link";
 import NotificationsNavLink from "@/components/notifications-nav-link";
+import OrdersNavLink from "@/components/orders-nav-link";
 import {
   Navbar,
   NavBody,
@@ -85,14 +85,13 @@ export default function MainNav() {
     }
   }
 
-  const publishHref =
-    !user
-      ? "/login"
-      : !user.imageCarteScolaire ||
-          user.cardStatus === "REJECTED" ||
-          user.cardStatus === "PENDING"
-        ? "/carte-scolaire"
-        : "/products";
+  const publishHref = !user
+    ? "/login"
+    : !user.imageCarteScolaire ||
+        user.cardStatus === "REJECTED" ||
+        user.cardStatus === "PENDING"
+      ? "/carte-scolaire"
+      : "/products";
 
   return (
     <>
@@ -118,7 +117,10 @@ export default function MainNav() {
             </Link>
 
             <div className="relative z-10 ml-auto flex shrink-0 items-center gap-3">
-              <form onSubmit={handleSearch} className="relative hidden min-w-0 lg:block">
+              <form
+                onSubmit={handleSearch}
+                className="relative hidden min-w-0 lg:block"
+              >
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="search"
@@ -129,12 +131,19 @@ export default function MainNav() {
                   className="w-52 rounded-full border border-[#4AA3A2] bg-transparent py-2 pl-9 pr-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 xl:w-64"
                 />
               </form>
-              <NavbarButton href={publishHref} variant="primary" className="bg-[#4AA3A2]">
+              <NavbarButton
+                href={publishHref}
+                variant="primary"
+                className="bg-[#4AA3A2]"
+              >
                 <PlusCircle className="mr-1 inline h-4 w-4" />
                 Déposer une annonce
               </NavbarButton>
 
-              <nav className="hidden items-center gap-1 border-l border-border pl-3 lg:flex" aria-label="Navigation">
+              <nav
+                className="hidden items-center gap-1 border-l border-border pl-3 lg:flex"
+                aria-label="Navigation"
+              >
                 {isAdmin && (
                   <Link
                     href="/admin"
@@ -151,12 +160,7 @@ export default function MainNav() {
                   <Heart className="h-4 w-4" /> Favoris
                 </Link>
                 {user && (
-                  <Link
-                    href="/orders"
-                    className="inline-flex h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-xs font-medium leading-tight text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <ShoppingBag className="h-4 w-4" /> Commandes
-                  </Link>
+                  <OrdersNavLink className="h-12 min-w-[3.75rem] flex-col justify-center gap-0.5 rounded-lg px-2 text-xs leading-tight hover:bg-muted" />
                 )}
                 {user && (
                   <MessagesNavLink className="h-12 min-w-[3.75rem] flex-col justify-center gap-0.5 rounded-lg px-2 text-xs leading-tight hover:bg-muted" />
@@ -239,7 +243,10 @@ export default function MainNav() {
                   </span>
                 </span>
               </Link>
-              <MobileNavToggle isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
+              <MobileNavToggle
+                isOpen={isOpen}
+                onClick={() => setIsOpen(!isOpen)}
+              />
             </MobileNavHeader>
             <div className="site-mobile-search w-full px-4 pb-2 pt-3">
               <form onSubmit={handleSearch} className="relative w-full">
@@ -265,12 +272,12 @@ export default function MainNav() {
                   {item.name}
                 </a>
               ))}
-               {isAdmin && (
-            <a
-              href="/admin"
-              onClick={() => setIsOpen(false)}
-              className="inline-flex items-center gap-1.5 text-muted-foreground"
-            >
+              {isAdmin && (
+                <a
+                  href="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="inline-flex items-center gap-1.5 text-muted-foreground"
+                >
                   <ShieldCheck className="h-4 w-4" />
                   Admin
                 </a>
@@ -284,14 +291,9 @@ export default function MainNav() {
                 Favoris
               </a>
               {user && (
-                <Link
-                  href="/orders"
-                  onClick={() => setIsOpen(false)}
-                  className="inline-flex items-center gap-1.5 text-muted-foreground"
-                >
-                  <ShoppingBag className="h-4 w-4" />
-                  Commandes
-                </Link>
+                <div onClick={() => setIsOpen(false)}>
+                  <OrdersNavLink className="!flex-row !items-center !gap-1.5 px-0" />
+                </div>
               )}
               {user && (
                 <div onClick={() => setIsOpen(false)}>
@@ -304,7 +306,11 @@ export default function MainNav() {
                 </div>
               )}
               <div className="flex w-full flex-col gap-2 pt-4">
-                <NavbarButton href={publishHref} variant="primary" className="w-full bg-[#4AA3A2]">
+                <NavbarButton
+                  href={publishHref}
+                  variant="primary"
+                  className="w-full bg-[#4AA3A2]"
+                >
                   <PlusCircle className="mr-1 inline h-4 w-4" />
                   Déposer une annonce
                 </NavbarButton>
