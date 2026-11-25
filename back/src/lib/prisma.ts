@@ -1,7 +1,10 @@
 import { PrismaClient } from "../generated/prisma/client";
-import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
 
-const adapter = new PrismaNeonHttp(process.env.DATABASE_URL!, {});
+neonConfig.webSocketConstructor = globalThis.WebSocket;
+
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 export default prisma;
