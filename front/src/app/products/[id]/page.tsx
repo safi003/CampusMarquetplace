@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import BuyButton from "@/components/buy-button";
 import ReservedNotice from "@/components/reserved-notice";
-import { ProductCard } from "@/components/product-card";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import WishlistButton from "@/components/wishlistButton";
@@ -205,14 +204,58 @@ export default async function ProductDetailPage({
 
       {similarProducts.length > 0 && (
         <section className="mt-10 border-t border-border pt-8">
-          <h2 className="text-xl font-semibold mb-4">Produits similaires</h2>
+          <h2 className="mb-5 text-2xl font-bold">Produits similaires</h2>
           <Carousel opts={{ align: "start" }} className="w-full">
             <CarouselContent>
-              {similarProducts.map((p: Product) => (
-                <CarouselItem key={p.id} className="basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                  <ProductCard product={p} className="w-full" />
-                </CarouselItem>
-              ))}
+              {similarProducts.map((p: Product) => {
+                const imageUrl = p.images?.[0]
+                  ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${p.images[0].url}`
+                  : null;
+
+                return (
+                  <CarouselItem key={p.id} className="basis-[min(85%,360px)]">
+                    <Link
+                      href={`/products/${p.id}`}
+                      className="group block h-full overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-lg"
+                    >
+                      <div className="aspect-[16/10] overflow-hidden bg-muted">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={p.name}
+                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                            Aucune image
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex min-h-48 flex-col p-5">
+                        <h3 className="line-clamp-1 text-lg font-semibold text-card-foreground">
+                          {p.name}
+                        </h3>
+                        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                          {p.description}
+                        </p>
+                        <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
+                          <div>
+                            <p className="text-lg font-bold text-[#4AA3A2]">
+                              {p.price} FCFA
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {p.seller.name}
+                            </p>
+                          </div>
+                          <span className="text-sm font-medium text-[#4AA3A2] group-hover:underline">
+                            Voir le produit
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </CarouselItem>
+                );
+              })}
             </CarouselContent>
             <CarouselPrevious className="hidden md:flex -left-4" />
             <CarouselNext className="hidden md:flex -right-4" />
