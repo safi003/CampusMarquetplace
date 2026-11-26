@@ -32,7 +32,7 @@ interface AdminOrder {
   expiresAt: string | null;
   buyer: { id: number; name: string };
   seller: { id: number; name: string };
-  product: { id: number; name: string; price: number; images: { id: number; url: string }[] };
+  product: { id: number; name: string; price: number; currency: string; images: { id: number; url: string }[] };
 } 
 const statusLabels: Record<AdminUser["cardStatus"], string> = {
   APPROVED: "Validé",

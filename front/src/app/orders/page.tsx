@@ -29,6 +29,7 @@ interface Order {
     id: number;
     name: string;
     price: number;
+    currency: string;
     status: string;
     images: { id: number; url: string }[];
   };

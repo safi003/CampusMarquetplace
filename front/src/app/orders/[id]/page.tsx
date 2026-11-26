@@ -24,6 +24,7 @@ interface OrderDetail {
     id: number;
     name: string;
     price: number;
+    currency: string;
     images: { id: number; url: string }[];
   };
 }
