@@ -3,8 +3,9 @@
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { Product } from "@/types/product";
+import { cn } from "@/lib/utils";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, className }: { product: Product; className?: string }) {
   const imageUrl = product.images?.[0]
     ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "")}/${product.images[0].url}`
     : null;
@@ -12,7 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <motion.a
       href={`/products/${product.id}`}
-      className="relative flex-shrink-0 w-[300px] h-[380px] rounded-2xl overflow-hidden group snap-start bg-card border border-border"
+      className={cn("relative flex-shrink-0 w-[300px] h-[380px] rounded-2xl overflow-hidden group snap-start bg-card border border-border", className)}
       whileHover={{ y: -8 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >

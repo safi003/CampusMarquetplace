@@ -206,11 +206,17 @@ export default async function ProductDetailPage({
       {similarProducts.length > 0 && (
         <section className="mt-10 border-t border-border pt-8">
           <h2 className="text-xl font-semibold mb-4">Produits similaires</h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {similarProducts.map((p: Product) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <Carousel opts={{ align: "start" }} className="w-full">
+            <CarouselContent>
+              {similarProducts.map((p: Product) => (
+                <CarouselItem key={p.id} className="basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                  <ProductCard product={p} className="w-full" />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex -left-4" />
+            <CarouselNext className="hidden md:flex -right-4" />
+          </Carousel>
         </section>
       )}
     </div>
