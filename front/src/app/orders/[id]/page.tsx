@@ -9,7 +9,7 @@ import { apiFetch } from "@/app/lib/api";
 
 interface OrderDetail {
   id: number;
-  status: "PENDING" | "ACTIVE" | "EXPIRED" | "COMPLETED" | "CANCELLED";
+  status: "ACTIVE" | "EXPIRED" | "COMPLETED" | "CANCELLED";
   mode: "DIRECT" | "HAND_DELIVERY";
   paymentType: "SECURED" | "DIRECT";
   paymentStatus: "NONE" | "HELD" | "RELEASED" | "REFUNDED";
@@ -266,7 +266,7 @@ export default function OrderDetailPage() {
           </div>
         )}
 
-        {(order.status === "PENDING" || order.status === "ACTIVE") && (
+        {order.status === "ACTIVE" && (
           <Button
             onClick={handleCancel}
             disabled={cancelling}

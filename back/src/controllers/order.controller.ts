@@ -40,22 +40,29 @@ export async function createOrder(req: Request, res: Response) {
       where: {
         productId,
         buyerId: req.user!.id,
-        status: { in: ["PENDING", "ACTIVE"] },
+        status: "ACTIVE",
       },
     });
     if (existing) {
       return res
         .status(409)
-        .json({ message: "Vous avez déjà une demande en cours pour ce produit" });
+        .json({ message: "Vous avez déjà une réservation en cours pour ce produit" });
     }
 
     await checkAndExpireActiveOrder(productId);
     const io = req.app.get("io") as Server | undefined;
 
     const order = await prisma.$transaction(async (tx) => {
-      const hasActiveOrder = await tx.order.findFirst({
+      const activeOrder = await tx.order.findFirst({
         where: { productId, status: "ACTIVE" },
       });
+      if (activeOrder) {
+        const remainingMs = activeOrder.expiresAt
+          ? Math.max(0, activeOrder.expiresAt.getTime() - Date.now())
+          : 15 * 60 * 1000;
+        const remainingMin = Math.max(1, Math.ceil(remainingMs / 60000));
+        throw { status: 409, message: `Produit réservé, réessayez dans environ ${remainingMin} min` };
+      }
 
       const created = await tx.order.create({
         data: {
@@ -64,18 +71,16 @@ export async function createOrder(req: Request, res: Response) {
           paymentType: paymentType ?? "DIRECT",
           buyerId: req.user!.id,
           sellerId: product.sellerId,
-          status: hasActiveOrder ? "PENDING" : "ACTIVE",
-          activatedAt: hasActiveOrder ? null : new Date(),
-          expiresAt: hasActiveOrder ? null : new Date(Date.now() + 15 * 60 * 1000),
+          status: "ACTIVE",
+          activatedAt: new Date(),
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
         },
       });
 
-      if (!hasActiveOrder) {
-        await tx.product.update({
-          where: { id: productId },
-          data: { status: "RESERVED" },
-        });
-      }
+      await tx.product.update({
+        where: { id: productId },
+        data: { status: "RESERVED" },
+      });
 
       return tx.order.findUnique({
         where: { id: created.id },
@@ -83,23 +88,13 @@ export async function createOrder(req: Request, res: Response) {
       });
     });
 
-    if (order!.status === "ACTIVE") {
-      await notify(
-        product.sellerId,
-        "NEW_ORDER",
-        `${order!.buyer.name} souhaite acheter "${product.name}"`,
-        `/orders/${order!.id}`,
-        io
-      );
-    } else {
-      await notify(
-        product.sellerId,
-        "NEW_ORDER_WAITING",
-        `${order!.buyer.name} veut aussi acheter "${product.name}" (en file d'attente)`,
-        `/orders/product/${product.id}/queue`,
-        io
-      );
-    }
+    await notify(
+      product.sellerId,
+      "NEW_ORDER",
+      `${order!.buyer.name} souhaite acheter "${product.name}"`,
+      `/orders/${order!.id}`,
+      io
+    );
 
     if (order!.paymentType === "SECURED") {
       const admins = await prisma.user.findMany({
@@ -117,7 +112,10 @@ export async function createOrder(req: Request, res: Response) {
       }
     }
     return res.status(201).json(order);
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.status) {
+      return res.status(error.status).json({ message: error.message || "Erreur" });
+    }
     console.error(error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
@@ -204,7 +202,7 @@ export async function updateOrderStatus(req: Request, res: Response) {
       return res.status(200).json(order);
     }
 
-    if (order.status !== "PENDING" && order.status !== "ACTIVE") {
+    if (order.status !== "ACTIVE") {
       return res.status(400).json({ message: "Cette commande ne peut plus être annulée" });
     }
     const updated = await prisma.$transaction(async (tx) => {
@@ -213,39 +211,10 @@ export async function updateOrderStatus(req: Request, res: Response) {
         data: { status: "CANCELLED", expiresAt: null },
       });
 
-      if (order.status === "ACTIVE") {
-        const next = await tx.order.findFirst({
-          where: { productId: order.productId, status: "PENDING" },
-          orderBy: { createdAt: "asc" },
-        });
-
-        if (next) {
-          await tx.order.update({
-            where: { id: next.id },
-            data: {
-              status: "ACTIVE",
-              activatedAt: new Date(),
-              expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-            },
-          });
-        } else {
-          await tx.product.update({
-            where: { id: order.productId },
-            data: { status: "AVAILABLE" },
-          });
-        }
-      } else {
-        const stillActive = await tx.order.findFirst({
-          where: { productId: order.productId, status: "ACTIVE" },
-        });
-
-        if (!stillActive) {
-          await tx.product.update({
-            where: { id: order.productId },
-            data: { status: "AVAILABLE" },
-          });
-        }
-      }
+      await tx.product.update({
+        where: { id: order.productId },
+        data: { status: "AVAILABLE" },
+      });
 
       return tx.order.findUnique({ where: { id }, include: orderInclude });
     });
@@ -261,118 +230,25 @@ export async function updateOrderStatus(req: Request, res: Response) {
   }
 }
 
-export async function getProductQueue(req: Request, res: Response) {
+export async function getActiveOrderForProduct(req: Request, res: Response) {
   try {
     const productId = Number(req.params.productId);
-    
     await checkAndExpireActiveOrder(productId);
 
-    const product = await prisma.product.findUnique({ where: { id: productId } });
-    if (!product) {
-      return res.status(404).json({ message: "Produit introuvable" });
-    }
-    if (product.sellerId !== req.user!.id && req.user!.role !== "ADMIN") {
-      return res
-        .status(403)
-        .json({ message: "Vous n'êtes pas le vendeur de ce produit" });
-    }
-
-    const orders = await prisma.order.findMany({
-      where: {
-        productId,
-        status: { in: ["ACTIVE", "PENDING"] },
-      },
-      include: {
-        buyer: { select: { id: true, name: true } },
-      },
-      orderBy: { createdAt: "asc" }, // premier arrivé, premier affiché
+    const active = await prisma.order.findFirst({
+      where: { productId, status: "ACTIVE" },
+      select: { id: true, expiresAt: true, status: true },
     });
 
-    const active = orders.find((o) => o.status === "ACTIVE") ?? null;
-    const waiting = orders.filter((o) => o.status === "PENDING");
+    if (!active) {
+      await prisma.product.updateMany({
+        where: { id: productId, status: "RESERVED" },
+        data: { status: "AVAILABLE" },
+      });
+    }
 
-    return res.status(200).json({
-      productId,
-      productStatus: product.status,
-      active,
-      waitingList: waiting,
-    });
+    return res.status(200).json(active);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Erreur serveur" });
-  }
-}
-
-export async function activateOrder(req: Request, res: Response) {
-  try {
-    const id = Number(req.params.id);
-
-    const order = await prisma.order.findUnique({
-      where: { id },
-      include: { product: true },
-    });
-    if (!order) {
-      return res.status(404).json({ message: "Commande introuvable" });
-    }
-    if (order.sellerId !== req.user!.id && req.user!.role !== "ADMIN") {
-      return res
-        .status(403)
-        .json({ message: "Vous n'êtes pas autorisé à activer cette commande" });
-    }
-    if (order.status !== "PENDING") {
-      return res
-        .status(400)
-        .json({ message: "Cette commande n'est pas en attente" });
-    }
-
-    const updated = await prisma.$transaction(async (tx) => {
-      // vérifie qu'il n'y a pas déjà une commande ACTIVE sur ce produit
-      const alreadyActive = await tx.order.findFirst({
-        where: { productId: order.productId, status: "ACTIVE" },
-      });
-      if (alreadyActive) {
-        throw { status: 409, code: "ALREADY_HAS_ACTIVE_ORDER" };
-      }
-
-      const activated = await tx.order.update({
-        where: { id },
-        data: {
-          status: "ACTIVE",
-          activatedAt: new Date(),
-          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-        },
-      });
-
-      // le produit reste RESERVED (il l'était déjà pour la file d'attente)
-      await tx.product.update({
-        where: { id: order.productId },
-        data: { status: "RESERVED" },
-      });
-
-      return activated;
-    });
-
-    const io = req.app.get("io") as Server | undefined;
-
-await notifyUser(io, {
-  userId: order.buyerId,
-  type: "ORDER_ACTIVATED",
-  content: `Votre commande pour "${order.product.name}" est activée. Vous avez 15 minutes pour confirmer.`,
-  link: `/orders/${id}`,
-});
-
-await notifyUser(io, {
-  userId: order.sellerId,
-  type: "ORDER_ACTIVATED",
-  content: `La commande de "${order.product.name}" est activée.`,
-  link: `/orders/${id}`,
-});
-
-    return res.status(200).json(updated);
-  } catch (error: any) {
-    if (error.status) {
-      return res.status(error.status).json({ message: error.code });
-    }
     console.error(error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
@@ -437,14 +313,7 @@ export async function confirmOrder(req: Request, res: Response) {
           data: { status: "SOLD" },
         });
 
-        // annule les autres commandes en attente pour ce produit
-        await tx.order.updateMany({
-          where: {
-            productId: confirmed.productId,
-            status: "PENDING",
-          },
-          data: { status: "CANCELLED" },
-        });
+
 
         return completed;
       }

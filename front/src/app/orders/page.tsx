@@ -8,14 +8,13 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle,
   PackageSearch,
 } from "lucide-react";
 import { apiFetch } from "@/app/lib/api";
 
 interface Order {
   id: number;
-  status: "PENDING" | "ACTIVE" | "EXPIRED" | "COMPLETED" | "CANCELLED";
+  status: "ACTIVE" | "EXPIRED" | "COMPLETED" | "CANCELLED";
   mode: "DIRECT" | "HAND_DELIVERY";
   paymentType: "SECURED" | "DIRECT";
   paymentStatus: "NONE" | "HELD" | "RELEASED" | "REFUNDED";
@@ -43,12 +42,6 @@ const statusConfig: Record<
     icon: Clock,
     color: "text-amber-700",
     bg: "bg-amber-50",
-  },
-  PENDING: {
-    label: "En attente",
-    icon: AlertCircle,
-    color: "text-blue-700",
-    bg: "bg-blue-50",
   },
   COMPLETED: {
     label: "Terminé",
@@ -176,7 +169,7 @@ export default function OrdersPage() {
   const activeTab = tab === "buyer" ? buyerOrders : sellerOrders;
 
   const activeCount = buyerOrders.filter((o) => o.status === "ACTIVE").length;
-  const pendingCount = sellerOrders.filter((o) => o.status === "PENDING").length;
+  const sellerActiveCount = sellerOrders.filter((o) => o.status === "ACTIVE").length;
 
   if (loading) {
     return (
@@ -217,9 +210,9 @@ export default function OrdersPage() {
         >
           <Store className="h-4 w-4" />
           Mes ventes ({sellerOrders.length})
-          {pendingCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-4 min-w-4 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
-              {pendingCount}
+          {sellerActiveCount > 0 && (
+            <span className="absolute -top-1 -right-1 h-4 min-w-4 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+              {sellerActiveCount}
             </span>
           )}
         </button>

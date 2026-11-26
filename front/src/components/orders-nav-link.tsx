@@ -10,7 +10,7 @@ import { apiFetch } from "@/app/lib/api";
 
 interface OrderBadge {
   id: number;
-  status: "PENDING" | "ACTIVE" | "EXPIRED" | "COMPLETED" | "CANCELLED";
+  status: "ACTIVE" | "EXPIRED" | "COMPLETED" | "CANCELLED";
   buyer: { id: number };
   seller: { id: number };
 }
@@ -43,7 +43,7 @@ export default function OrdersNavLink({
               (o) =>
                 (o.buyer.id === userId && o.status === "ACTIVE") ||
                 (o.seller.id === userId &&
-                  (o.status === "ACTIVE" || o.status === "PENDING")),
+                  o.status === "ACTIVE"),
             ).length
           : 0;
 

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import BuyButton from "@/components/buy-button";
+import ReservedNotice from "@/components/reserved-notice";
+import { ProductCard } from "@/components/product-card";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import WishlistButton from "@/components/wishlistButton";
@@ -67,6 +69,14 @@ export default async function ProductDetailPage({
   }
 
   const reviewsData = await getReviews(String(product.seller.id));
+  const similarRes = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/products?categoryId=${product.category.id}`,
+    { cache: "no-store" },
+  );
+  const similarData = similarRes.ok ? await similarRes.json() : [];
+  const similarProducts = (Array.isArray(similarData) ? similarData : [])
+    .filter((p: Product) => p.id !== product.id && p.status === "AVAILABLE")
+    .slice(0, 4);
 
   return (
     <div className="max-w-4xl mx-auto p-6 pb-24 md:pb-6">
@@ -154,9 +164,7 @@ export default async function ProductDetailPage({
                 Vendu
               </div>
             ) : product.status === "RESERVED" ? (
-              <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-center text-sm font-medium text-amber-700">
-                Réservé — tentez votre chance
-              </div>
+              <ReservedNotice productId={product.id} />
             ) : (
               <BuyButton productId={product.id} />
             )}
@@ -182,9 +190,7 @@ export default async function ProductDetailPage({
               Vendu
             </div>
           ) : product.status === "RESERVED" ? (
-            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-center text-sm font-medium text-amber-700">
-              Réservé — tentez votre chance
-            </div>
+            <ReservedNotice productId={product.id} />
           ) : (
             <BuyButton productId={product.id} />
           )}
@@ -196,6 +202,17 @@ export default async function ProductDetailPage({
           </Link>
         </div>
       </div>
+
+      {similarProducts.length > 0 && (
+        <section className="mt-10 border-t border-border pt-8">
+          <h2 className="text-xl font-semibold mb-4">Produits similaires</h2>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {similarProducts.map((p: Product) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

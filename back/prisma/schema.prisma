@@ -28,10 +28,10 @@ enum DeliveryMode {
 }
 //ajout
 enum OrderStatus {
-  PENDING     // en file d'attente derrière une réservation active
-  ACTIVE      // réservation en cours pour ce client, chrono lancé
-  EXPIRED     // 15 min dépassées sans confirmation ni paiement verrouillé
-  COMPLETED   // double confirmation faite → vente actée
+  PENDING
+  ACTIVE
+  EXPIRED
+  COMPLETED
   CANCELLED
 }
 
