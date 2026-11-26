@@ -32,6 +32,7 @@ export default function EditProductPage() {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
+  const [currency, setCurrency] = useState("FCFA")
   const [address, setAddress] = useState("")
   const [handDelivery, setHandDelivery] = useState(false);
   const [categoryId, setCategoryId] = useState("")
@@ -60,6 +61,7 @@ export default function EditProductPage() {
         setName(product.name)
         setDescription(product.description)
         setPrice(String(product.price))
+        setCurrency(product.currency || "FCFA")
         setAddress(product.address)
         setHandDelivery(product.handDelivery);
         setCategoryId(String(product.category.id))
@@ -81,6 +83,7 @@ export default function EditProductPage() {
           name,
           description,
           price,
+          currency,
           categoryId,
           address,
           handDelivery,
@@ -132,7 +135,18 @@ export default function EditProductPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="price">Prix</Label>
-                <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+                <div className="flex items-end gap-2">
+                  <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} required className="flex-1" />
+                  <select
+                    id="currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 transition-all"
+                  >
+                    <option value="FCFA">FCFA</option>
+                    <option value="FG">FG</option>
+                  </select>
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="categoryId">Catégorie</Label>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/format-price";
 import {
   ShoppingBag,
   Store,
@@ -104,7 +105,7 @@ function OrderCard({
       <div className="flex-1 min-w-0">
         <h3 className="font-semibold text-sm truncate">{order.product.name}</h3>
         <p className="text-sm font-bold text-[#4AA3A2]">
-          {order.product.price} FCFA
+          {formatPrice(order.product.price, order.product.currency)}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {role === "buyer"

@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  currency: string;
   address: string;
   status: "AVAILABLE" | "RESERVED" | "SOLD"; 
   handDelivery: boolean;

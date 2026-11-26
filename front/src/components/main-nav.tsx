@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import {
   User,
   LogOut,
@@ -45,7 +45,6 @@ const categories = [
   { name: "Cuisine", icon: Utensils, slug: "cuisine" },
   { name: "Sport", icon: Dumbbell, slug: "sport" },
   { name: "Informatique", icon: Laptop, slug: "informatique" },
-  { name: "Musique", icon: Music, slug: "musique" },
   { name: "Vélos", icon: Bike, slug: "velos" },
   { name: "Autres", icon: Ellipsis, slug: "autres" },
 ];

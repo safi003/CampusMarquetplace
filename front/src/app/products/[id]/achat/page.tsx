@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Product } from "@/types/product";
+import { formatPrice } from "@/lib/format-price";
 import AchatOptions from "@/components/achat-options";
 
 async function getProduct(id: string): Promise<Product | null> {
@@ -28,7 +29,7 @@ export default async function AchatPage({
     <div className="mx-auto max-w-2xl p-6">
       <h1 className="text-2xl font-bold">Choisissez votre mode d&apos;achat</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        {product.name} — {product.price} FCFA
+        {product.name} — {formatPrice(product.price, product.currency)}
       </p>
 
       <div className="mt-6 flex items-center gap-4 rounded-xl border border-border bg-card p-4">

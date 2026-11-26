@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { formatPrice } from "@/lib/format-price";
 import { ShieldCheck, MessageCircle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/app/lib/api";
@@ -195,7 +196,7 @@ export default function OrderDetailPage() {
               {order.product.name}
             </Link>
             <p className="text-sm text-muted-foreground">
-              {order.product.price} FCFA
+              {formatPrice(order.product.price, order.product.currency)}
             </p>
           </div>
         </div>

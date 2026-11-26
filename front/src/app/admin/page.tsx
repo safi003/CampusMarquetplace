@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { apiFetch } from "@/app/lib/api";
+import { formatPrice } from "@/lib/format-price";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -365,7 +366,7 @@ async function releasePayment(id: number) {
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="font-semibold text-sm truncate">{o.product.name}</p>
-            <p className="text-sm font-bold text-[#4AA3A2]">{o.product.price} FCFA</p>
+            <p className="text-sm font-bold text-[#4AA3A2]">{formatPrice(o.product.price, o.product.currency)}</p>
             <p className="text-xs text-muted-foreground truncate">
               {o.buyer.name} → {o.seller.name} · n°{o.id}
             </p>

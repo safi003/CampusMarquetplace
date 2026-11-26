@@ -31,6 +31,7 @@ export default function CreateProductPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [currency, setCurrency] = useState("FCFA");
   const [address, setAddress] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -82,6 +83,7 @@ export default function CreateProductPage() {
     formData.append("name", name);
     formData.append("description", description);
     formData.append("price", price);
+    formData.append("currency", currency);
     formData.append("categoryId", categoryId);
     formData.append("address", address);
     formData.append("handDelivery", String(handDelivery));
@@ -167,14 +169,26 @@ export default function CreateProductPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="price">Prix </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  placeholder="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
-                />
+                <div className="flex items-end gap-2">
+                  <Input
+                    id="price"
+                    type="number"
+                    placeholder="0"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                    className="flex-1"
+                  />
+                  <select
+                    id="currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 transition-all"
+                  >
+                    <option value="FCFA">FCFA</option>
+                    <option value="FG">FG</option>
+                  </select>
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="categoryId">Catégorie</Label>

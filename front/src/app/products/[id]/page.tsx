@@ -4,6 +4,7 @@ import { MessageCircle } from "lucide-react";
 import BuyButton from "@/components/buy-button";
 import ReservedNotice from "@/components/reserved-notice";
 import { Product } from "@/types/product";
+import { formatPrice } from "@/lib/format-price";
 import { Button } from "@/components/ui/button";
 import WishlistButton from "@/components/wishlistButton";
 import { DeleteProductButton } from "@/components/delete-product-button";
@@ -102,7 +103,7 @@ export default async function ProductDetailPage({
             <div>
               <h1 className="text-2xl font-bold">{product.name}</h1>
               <p className="text-gray-500">{product.category.name}</p>
-              <p className="text-xl font-semibold mt-2">{product.price} </p>
+              <p className="text-xl font-semibold mt-2">{formatPrice(product.price, product.currency)}</p>
             </div>
 
             <p>{product.description}</p>
@@ -241,7 +242,7 @@ export default async function ProductDetailPage({
                         <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
                           <div>
                             <p className="text-lg font-bold text-[#4AA3A2]">
-                              {p.price} FCFA
+                              {formatPrice(p.price, p.currency)}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               {p.seller.name}

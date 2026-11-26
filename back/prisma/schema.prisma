@@ -96,6 +96,7 @@ model Product {
   name        String
   description String
   price       Decimal
+  currency    String @default("FCFA")
   address     String?
   status      ProductStatus @default(AVAILABLE)   // remplace isSold
   handDelivery Boolean @default(false)

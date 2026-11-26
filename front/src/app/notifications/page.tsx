@@ -66,21 +66,23 @@ export default function NotificationsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6  gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold">
             <Bell className="h-6 w-6 text-[#4AA3A2]" />
             Notifications
           </h1>
-          {unreadCount > 0 && (
+          <div className="flex items-center justify-between">
+            {unreadCount > 0 && (
             <p className="mt-1 text-sm text-muted-foreground">{unreadCount} non lue(s)</p>
-          )}
-        </div>
-        {unreadCount > 0 && (
-          <Button variant="outline" onClick={markAllRead}>
+            )}
+            {unreadCount > 0 && (
+            <Button variant="outline" onClick={markAllRead}>
             Tout marquer comme lu
-          </Button>
-        )}
+           </Button>
+           )}
+          </div>
+        </div>
       </div>
 
       {showLoading ? (

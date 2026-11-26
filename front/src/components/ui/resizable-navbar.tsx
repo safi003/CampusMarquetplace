@@ -190,17 +190,26 @@ export const MobileNavMenu = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className={cn(
-            "absolute inset-x-0 top-full z-50 flex w-full flex-col items-start justify-start gap-4 border-y border-border bg-background px-6 py-6 shadow-xl dark:bg-neutral-950",
-            className,
-          )}
-        >
-          {children}
-        </motion.div>
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              "absolute inset-x-0 top-full z-50 flex w-full flex-col items-start justify-start gap-4 border-y border-border bg-background px-6 py-6 shadow-xl dark:bg-neutral-950",
+              className,
+            )}
+          >
+            {children}
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

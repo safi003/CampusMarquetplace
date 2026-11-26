@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { Product } from "@/types/product";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format-price";
 
 export function ProductCard({ product, className }: { product: Product; className?: string }) {
   const imageUrl = product.images?.[0]
@@ -35,7 +36,7 @@ export function ProductCard({ product, className }: { product: Product; classNam
         </div>
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
-            <p className="text-lg font-bold text-[#4AA3A2]">{product.price} FCFA</p>
+            <p className="text-lg font-bold text-[#4AA3A2]">{formatPrice(product.price, product.currency)}</p>
             <p className="text-xs text-muted-foreground">{product.seller.name}</p>
           </div>
           <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground transition-transform duration-300 group-hover:rotate-[-45deg] group-hover:bg-[#4AA3A2] group-hover:text-white">

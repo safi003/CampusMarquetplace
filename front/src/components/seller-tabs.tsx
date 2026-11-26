@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import StarRating from "@/components/star-rating";
 import RatingSummary from "@/components/rating-summary";
+import { formatPrice } from "@/lib/format-price";
 import ReviewFormWrapper from "@/components/review-form-wrapper";
 import { Product } from "@/types/product";
 
@@ -133,7 +134,7 @@ export default function SellerTabs({
                       {product.category.name}
                     </span>
                     <h3 className="mt-1 font-semibold text-sm">{product.name}</h3>
-                    <p className="mt-2 text-base font-bold text-[#4AA3A2]">{product.price} FCFA</p>
+                    <p className="mt-2 text-base font-bold text-[#4AA3A2]">{formatPrice(product.price, product.currency)}</p>
                   </div>
                 </Link>
               ))}
